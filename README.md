@@ -8,6 +8,5 @@
 #### Using `run.sh`
 
 Usage: `./run.sh [problem number]`<br>
-Be sure you are using a Bash shell<br>
-and have `input.txt` ready in the directory.<br>
+Be sure you are using a Bash shell and have `input.txt` ready in the directory.<br>
 It will be redirected to the standard input of the program.
