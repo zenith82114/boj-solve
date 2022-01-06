@@ -1,7 +1,7 @@
 /*
  * Q2206 - Grid maze BFS
  * Date: 2021.7.15
- * 
+ *
  * One wall break is allowed.
  */
 
@@ -19,18 +19,18 @@ int dn[4] = { 0,-1,0,1 };
 queue<tuple<int, int, int, int> > Q;
 
 constexpr bool IN_RANGE(int n, int m) {
-    return (n > 0 && n <= N && m > 0 && m <= M);
+	return (n > 0 && n <= N && m > 0 && m <= M);
 }
 int main()
 {
-    ios::sync_with_stdio(0); cin.tie(0);
+	ios::sync_with_stdio(0); cin.tie(0);
 	int n, m, n_, m_, b, c, k;
-    char t;
-    
-    cin >> N >> M;
+	char t;
+
+	cin >> N >> M;
 	for (n = 1; n <= N; ++n) {
 		for (m = 1; m <= M; ++m) {
-            cin >> t;
+			cin >> t;
 			// data (map)
 			A[n][m] = t - '0';
 			// "footprint" array

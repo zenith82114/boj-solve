@@ -23,9 +23,9 @@ int main()
 {
 	cin.tie(0); ios::sync_with_stdio(0);
 	uint32_t N, K;
-    uint64_t R = 1;
-    
-    cin >> N >> K;
+	uint64_t R = 1;
+
+	cin >> N >> K;
 	if (2 * K > N) K = N - K;
 	for (uint32_t n = N - K + 1; n <= N; ++n)
 		R = (R * n) % M;

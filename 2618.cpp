@@ -29,7 +29,7 @@ int main()
 		cin >> i >> j;
 		pos[w] = make_pair(i, j);
 	}
-	
+
 	fill_n(dp[W], W + 1, 0);
 	for (i = W - 1; i >= 0; --i) {
 		dp[i][W] = 0;

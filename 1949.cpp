@@ -56,6 +56,6 @@ int main()
 	}
 	dfs(1, 0);
 	cout << dp[1][3];
-    
+	
 	return 0;
 }

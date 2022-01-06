@@ -35,7 +35,7 @@ int main()
 	int TC;
 	int A, B, n, m, nn, v;
 	bool done;
-	
+
 	cin >> TC;
 	while (TC--) {
 		queue<int> Q;
@@ -43,7 +43,7 @@ int main()
 		cin >> A >> B;
 		visitor[A] = FROM_A; Q.push(A);
 		visitor[B] = FROM_B; Q.push(B);
-		
+
 		done = false;
 		while (!done) {
 			n = Q.front(); Q.pop();

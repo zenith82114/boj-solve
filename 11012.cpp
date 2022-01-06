@@ -20,18 +20,18 @@ struct Item {
 vector<Item> items;
 
 class SegTree {
-    int N;
-    vector<int> A;
-    constexpr int ceil_pow2(int n) {
-        if (n & (n - 1)) {
-            for (int i = 1; i < 32; i <<= 1)
-                n |= (n >> i);
-            return n + 1;
-        }
-        return n;
-    }
-    constexpr int lChild(int n) { return n << 1; }
-    constexpr int rChild(int n) { return n << 1 | 1; }
+	int N;
+	vector<int> A;
+	constexpr int ceil_pow2(int n) {
+		if (n & (n - 1)) {
+			for (int i = 1; i < 32; i <<= 1)
+				n |= (n >> i);
+			return n + 1;
+		}
+		return n;
+	}
+	constexpr int lChild(int n) { return n << 1; }
+	constexpr int rChild(int n) { return n << 1 | 1; }
 	void addRangeUtil(int n, int l, int r, int i, int j, int k) {
 		int m;
 		if (i == l && j == r) {
@@ -49,10 +49,10 @@ class SegTree {
 		}
 	}
 public:
-    SegTree(int _N) {
-        N = _N;
-        A.resize(2 * ceil_pow2(N), 0);
-    }
+	SegTree(int _N) {
+		N = _N;
+		A.resize(2 * ceil_pow2(N), 0);
+	}
 	void clear() { A.clear(); }
 	void addRange(int i, int j, int k) {
 		addRangeUtil(1, 0, N-1, i, j, k);
