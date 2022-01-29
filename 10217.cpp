@@ -1,64 +1,65 @@
 /*
  * Q10217 - Dijkstra's + DP
- * Date: 2021.7.22
+ * Date: 2021.7.22, 2022.1.30(revised)
  */
 
 #include<iostream>
-#include<limits>
+#include<array>
+#include<vector>
 #include<queue>
-#include<tuple>
-#include<algorithm>
 using namespace std;
+constexpr int INF = INT32_MAX;
 
-typedef tuple<int, int, int> Info;
-struct PQcmp {
-	bool operator()(const Info& a, const Info& b) {
-		return get<2>(a) > get<2>(b);
-	}
+struct Info { int v, c, d; };
+struct cmpInfo {
+    bool operator()(const Info& lhs, const Info& rhs) const {
+        return lhs.d > rhs.d;
+    }
 };
+array<vector<Info>, 101> adj;
+array<array<int, 10001>, 101> dp;
 
-const int INF = numeric_limits<int>::max();
-vector<vector<Info>> adj;
-int dp[100][10001];
+int main() {
+    cin.tie(0)->sync_with_stdio(0);
+    int TC;
+    int N, M, K, u, v, c, d, r;
+    int c_old, d_old, c_new, d_new;
 
-int main()
-{
-	ios::sync_with_stdio(0); cin.tie(0);
-	int TC;
-	int N, M, K, u, v, c, d, r;
-	int c_old, d_old, c_new, d_new;
+    cin >> TC;
+    while (TC--) {
+        cin >> N >> M >> K;
+        for (v = 1; v <= N; v++)
+            adj[v].clear();
+        while (K--) {
+            cin >> u >> v >> c >> d;
+            adj[u].push_back({v, c, d});
+        }
 
-	cin >> TC;
-	while (TC--) {
-		cin >> N >> M >> K;
-		adj.clear(); adj.resize(N);
-		while (K--) {
-			cin >> u >> v >> c >> d;
-			adj[--u].emplace_back(--v, c, d);
-		}
-		fill_n(dp[0], M + 1, 0);
-		for (int n = 1; n < N;
-			fill_n(dp[n++], M + 1, INF));
+        for (c = 0; c <= M; c++)
+            dp[1][c] = 0;
+        for (v = 1; v <= N; v++)
+            for (c = 0; c <= M; c++)
+                dp[v][c] = INF;
 
-		priority_queue<Info, vector<Info>, PQcmp> PQ;
-		PQ.emplace(0, 0, 0);
-		while (!PQ.empty()) {
-			tie(u, c_old, d_old) = PQ.top(); PQ.pop();
-			if (dp[u][c_old] < d_old) continue;
-			for (const auto& vcd : adj[u]) {
-				tie(v, c, d) = vcd;
-				c_new = c_old + c;
-				d_new = d_old + d;
-				for (c = c_new; c <= M && dp[v][c] > d_new;
-					dp[v][c++] = d_new);
-				if (c > c_new)
-					PQ.emplace(v, c_new, d_new);
-			}
-		}
-		r = dp[N - 1][M];
-		if (r == INF) cout << "Poor KCM\n";
-		else cout << r << '\n';
-	}
+        priority_queue<Info, vector<Info>, cmpInfo> pq;
+        pq.push({1, 0, 0});
+        while (!pq.empty()) {
+            auto cur = pq.top(); pq.pop();
+            if (dp[cur.v][cur.c] < cur.d)
+                continue;
+            for (auto& nxt : adj[cur.v]) {
+                c_new = cur.c + nxt.c;
+                d_new = cur.d + nxt.d;
+                for (c = c_new; c <= M && dp[nxt.v][c] > d_new; c++)
+                    dp[nxt.v][c] = d_new;
+                if (c > c_new)
+                    pq.push({nxt.v, c_new, d_new});
+            }
+        }
+        r = dp[N][M];
+        if (r == INF) cout << "Poor KCM\n";
+        else cout << r << '\n';
+    }
 
-	return 0;
+    return 0;
 }

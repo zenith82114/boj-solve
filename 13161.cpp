@@ -1,5 +1,5 @@
 /*
- * Q13161 - MCMF duality and Dinic's alg.
+ * Q13161 - Max-flow min-cut duality and Dinic's alg.
  * Date: 2022.1.28
  */
 

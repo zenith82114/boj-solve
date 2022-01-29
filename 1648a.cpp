@@ -24,7 +24,7 @@ void buildMap(vector<int>& v, int k, int i) {
 }
 
 int main() {
-	cin.tie(0)->sync_with_stdio(0);
+    cin.tie(0)->sync_with_stdio(0);
 
     cin >> N >> M;
     if (N & M & 1) {
