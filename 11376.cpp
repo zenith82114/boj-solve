@@ -8,20 +8,19 @@
 #include<queue>
 using namespace std;
 
-array<array<int, 2002>, 2002> G{};
+array<array<int, 2002>, 2002> G;
 array<bool, 2002> visited;
 array<int, 2002> pred;
-int T;
 
-bool bfs() {
+bool bfs(int S, int T) {
     queue<int> q;
     int u, v;
-    q.push(0);
+    q.push(S);
     visited.fill(false);
-    visited[0] = true;
+    visited[S] = true;
     while (!q.empty()) {
         u = q.front(); q.pop();
-        for (v = 0; v <= T; v++) {
+        for (v = S; v <= T; v++) {
             if (!visited[v] && G[u][v] > 0) {
                 if (v == T) {
                     pred[T] = u;
@@ -38,7 +37,7 @@ bool bfs() {
 
 int main() {
     cin.tie(0)->sync_with_stdio(0);
-    int N, M, n, m, k, C;
+    int N, M, T, n, m, k, C;
 
     cin >> N >> M;
     T = N+M+1;
@@ -54,7 +53,7 @@ int main() {
         G[m+N][T] = 1;
 
     C = 0;
-    while (bfs()) {
+    while (bfs(0, T)) {
         C++;
         for (int v = T; v != 0; v = pred[v]) {
             G[pred[v]][v]--;

@@ -42,8 +42,7 @@ class SegTree {
     void update(int n, ull x) {
         while (n && A[n] != x) {
             A[n] = x;
-            int m = n & 1 ? n & -2 : n | 1;
-            x = join(x, A[m]);
+            x = join(x, A[n ^ 1]);
             n >>= 1;
         }
     }
