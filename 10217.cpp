@@ -1,6 +1,6 @@
 /*
  * Q10217 - Dijkstra's + DP
- * Date: 2021.7.22, 2022.1.30(revised)
+ * Date: 2021.7.22, 2022.3.13(revised)
  */
 
 #include<iostream>
@@ -23,7 +23,7 @@ int main() {
     cin.tie(0)->sync_with_stdio(0);
     int TC;
     int N, M, K, u, v, c, d, r;
-    int c_old, d_old, c_new, d_new;
+    int c_new, d_new;
 
     cin >> TC;
     while (TC--) {
@@ -37,9 +37,10 @@ int main() {
 
         for (c = 0; c <= M; c++)
             dp[1][c] = 0;
-        for (v = 1; v <= N; v++)
+        for (v = 1; v <= N; v++) {
             for (c = 0; c <= M; c++)
                 dp[v][c] = INF;
+        }
 
         priority_queue<Info, vector<Info>, cmpInfo> pq;
         pq.push({1, 0, 0});

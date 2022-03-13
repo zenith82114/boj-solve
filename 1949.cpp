@@ -55,7 +55,7 @@ int main()
         adj[v].push_back(u);
     }
     dfs(1, 0);
-    cout << dp[1][3];
+    cout << dp[1][3] << '\n';
     
     return 0;
 }

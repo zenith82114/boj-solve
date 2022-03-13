@@ -57,7 +57,7 @@ int main() {
 
     for (i = 1, ni = DN; i <= N; ++i, --ni) {
         if (sccNo[i] == sccNo[ni]) {
-            cout << 0;
+            cout << "0\n";
             return 0;
         }
         else sol[i] = (sccNo[ni] < sccNo[i]);
@@ -65,6 +65,7 @@ int main() {
     cout << "1\n";
     for (i = 1; i <= N; ++i)
         cout << sol[i] << ' ';
+    cout << '\n';
 
     return 0;
 }

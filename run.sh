@@ -10,7 +10,7 @@ if [ ! -f "./input.txt" ]; then
 fi
 
 echo "Compiling $1.cpp..."
-g++ -Wall $1.cpp -o solve
+g++ -Wall -O3 $1.cpp -o solve
 
 echo "Running Problem #$1..."
 echo -e "================================"

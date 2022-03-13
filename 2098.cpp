@@ -34,7 +34,7 @@ int main()
                 if (!(I & J) && W[i][j])
                     dp[I | J][j] = min(dp[I | J][j], dp[I][i] + W[i][j]);
         }
-    cout << dp[M - 1][0];
+    cout << dp[M - 1][0] << '\n';
 
     return 0;
 }

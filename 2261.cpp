@@ -72,4 +72,6 @@ int main()
     sort(V.begin(), V.end(),
     [](const Point& p, const Point& q) { return p.x < q.x; });
     cout << minSqrDist(V, 0, N-1) << '\n';
+
+    return 0;
 }

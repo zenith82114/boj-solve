@@ -45,7 +45,8 @@ int main() {
     cout.tie(0)->sync_with_stdio(0);
     vector<vec2> points, hull;
     double d, _d;
-    int TC, N, M, i, j, j0, P, Q;
+    int TC, N, M, i, j, j0;
+    int P = 0, Q = 0;
 
     cin >> TC;
     while (TC--) {
@@ -80,7 +81,8 @@ int main() {
         if (M > 3) {
             i = 0, j = 1;
             while (cross(hull[1] - hull[0], hull[(j+1)%M] - hull[j]) > 0)
-                j0 = ++j;
+                j++;
+            j0 = j;
             while (i < j0 && j < M) {
                 _d = dist(hull[i], hull[j]);
                 if (d < _d) {

@@ -60,6 +60,7 @@ int main()
         for (int& i : p1)
             cout << i << ' ';
     }
+    cout << '\n';
 
     return 0;
 }

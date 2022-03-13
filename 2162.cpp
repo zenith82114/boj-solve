@@ -8,44 +8,38 @@
 using namespace std;
 constexpr int MAX = 3000;
 
-struct Point { int x, y; };
+struct vec2 {
+    int x, y;
+    bool operator<(const vec2& v) const {
+        return y != v.y ? y < v.y : x < v.x;
+    };
+    vec2 operator-(const vec2& v) const {
+        return { x-v.x, y-v.y };
+    }
+};
 struct Segment {
-    Point p1, p2;
+    vec2 p1, p2;
 }segm[MAX];
 
-int signof_crossprod
-    (Point& Po, Point& Pi, Point& Pj)
-{
-    int	xi = Pi.x - Po.x, yi = Pi.y - Po.y,
-        xj = Pj.x - Po.x, yj = Pj.y - Po.y;
-    int A = xi * yj, B = xj * yi;
-    return (A == B ? 0 : (A > B) ? 1 : -1);
+int64_t cross(const vec2& v, const vec2& w) {
+    return v.x*w.y - v.y*w.x;
+}
+int ccw(const vec2& o, const vec2& p, const vec2& q) {
+    auto k = cross(p-o, q-o);
+    return (k < 0) ? -1 : (k > 0);
 }
 bool intersects(int i, int j)
 {
-    Segment& Si = segm[i], & Sj = segm[j];
-    int s1 = signof_crossprod(Si.p1, Si.p2, Sj.p1),
-        s2 = signof_crossprod(Si.p1, Si.p2, Sj.p2),
-        s3 = signof_crossprod(Sj.p1, Sj.p2, Si.p1),
-        s4 = signof_crossprod(Sj.p1, Sj.p2, Si.p2);
-    int L, M = 0, a[4];
-    if (s1 != s2 && s3 != s4)
-        return 1;
-    else if (!(s1 || s2)) {
-        if (Si.p1.y == Si.p2.y) {
-            a[0] = Si.p1.x; a[1] = Si.p2.x;
-            a[2] = Sj.p1.x; a[3] = Sj.p2.x;
-        } else {
-            a[0] = Si.p1.y; a[1] = Si.p2.y;
-            a[2] = Sj.p1.y; a[3] = Sj.p2.y;
-        }
-        L = abs(a[0] - a[1]) + abs(a[2] - a[3]);
-        for (int i = 0; i < 4; ++i)
-            for (int j = i + 1; j < 4; ++j)
-                M = max(M, abs(a[i] - a[j]));
-        return L >= M;
+    vec2 &a = segm[i].p1, &b = segm[i].p2;
+    vec2 &c = segm[j].p1, &d = segm[j].p2;
+    int ab = ccw(a,b,c) * ccw(a,b,d);
+    int cd = ccw(c,d,a) * ccw(c,d,b);
+    if (!(ab || cd)) {
+        if (b < a) swap(a,b);
+        if (d < c) swap(c,d);
+        return !(b < c || d < a);
     }
-    else return 0;
+    return ab <= 0 && cd <= 0;
 }
 
 struct Data {
@@ -98,7 +92,7 @@ int main()
             }
         }
     }
-    cout << nG << '\n' << maxGsize;
+    cout << nG << '\n' << maxGsize << '\n';
 
     return 0;
 }

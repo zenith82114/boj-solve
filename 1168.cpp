@@ -67,7 +67,7 @@ int main() {
         i = ((i - 1) % N) + 1;
         cout << ", " << segt.query(i);
     }
-    cout << '>';
+    cout << ">\n";
 
     return 0;
 }

@@ -85,7 +85,7 @@ int main()
             T--; S += d;
         }
     }
-    cout << S;
+    cout << S << '\n';
 
     return 0;
 }

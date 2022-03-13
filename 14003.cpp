@@ -31,6 +31,7 @@ int main()
             least_last[L--] = A[N];
     }
     for (L = 0; L < maxL; cout << least_last[L++] << " ");
+    cout << '\n';
 
     return 0;
 }

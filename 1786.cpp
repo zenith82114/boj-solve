@@ -40,6 +40,7 @@ int main()
     }
     cout << matches.size() << '\n';
     for (int& m : matches) cout << m << ' ';
+    cout << '\n';
 
     return 0;
 }

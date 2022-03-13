@@ -21,8 +21,7 @@ queue<tuple<int, int, int, int> > Q;
 constexpr bool IN_RANGE(int n, int m) {
     return (n > 0 && n <= N && m > 0 && m <= M);
 }
-int main()
-{
+int main() {
     ios::sync_with_stdio(0); cin.tie(0);
     int n, m, n_, m_, b, c, k;
     char t;
@@ -70,4 +69,7 @@ int main()
     }
     if (C[N][M] == INF) cout << -1;
     else cout << C[N][M];
+    cout << '\n';
+
+    return 0;
 }
