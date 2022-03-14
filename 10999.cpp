@@ -5,11 +5,11 @@
 
 #include<bits/stdc++.h>
 using namespace std;
-using llint = long long;
+using ll = long long;
 
 class SegTree {
     int N;
-    vector<llint> A, lazy;
+    vector<ll> A, lazy;
     constexpr int ceilPow2(int n) {
         if (n & (n-1)) {
             for (int i=1; i<32; i<<=1)
@@ -18,70 +18,70 @@ class SegTree {
         }
         return n;
     }
-    int lChld(int n) { return n<<1; }
-    int rChld(int n) { return n<<1 | 1; }
-    void initUtil(int n, int l, int r, vector<llint>& v) {
+    int lc(int n) { return n<<1; }
+    int rc(int n) { return n<<1 | 1; }
+    void initUtil(int n, int l, int r, vector<ll>& v) {
         int m = (l+r)/2;
         if (l != r) {
-            initUtil(lChld(n), l, m, v);
-            initUtil(rChld(n), m+1, r, v);
-            A[n] = A[lChld(n)] + A[rChld(n)];
+            initUtil(lc(n), l, m, v);
+            initUtil(rc(n), m+1, r, v);
+            A[n] = A[lc(n)] + A[rc(n)];
         }
         else A[n] = v[l];
     }
-    void addUtil(int n, int l, int r, int i, int j, llint x) {
+    void addUtil(int n, int l, int r, int i, int j, ll x) {
         int m = (l+r)/2;
         if (lazy[n]) {
             A[n] += (r-l+1)*lazy[n];
             if (l != r) {
-                lazy[lChld(n)] += lazy[n];
-                lazy[rChld(n)] += lazy[n];
+                lazy[lc(n)] += lazy[n];
+                lazy[rc(n)] += lazy[n];
             }
             lazy[n] = 0;
         }
         if (l > j || r < i)
             return;
         if (l < i || r > j) {
-            addUtil(lChld(n), l, m, i, j, x);
-            addUtil(rChld(n), m+1, r, i, j, x);
-            A[n] = A[lChld(n)] + A[rChld(n)];
+            addUtil(lc(n), l, m, i, j, x);
+            addUtil(rc(n), m+1, r, i, j, x);
+            A[n] = A[lc(n)] + A[rc(n)];
         }
         else {
             A[n] += (r-l+1)*x;
             if (l != r) {
-                lazy[lChld(n)] += x;
-                lazy[rChld(n)] += x;
+                lazy[lc(n)] += x;
+                lazy[rc(n)] += x;
             }
         }
     }
-    llint queryUtil(int n, int l, int r, int i, int j) {
+    ll queryUtil(int n, int l, int r, int i, int j) {
         int m = (l+r)/2;
         if (lazy[n]) {
             A[n] += (r-l+1)*lazy[n];
             if (l != r) {
-                lazy[lChld(n)] += lazy[n];
-                lazy[rChld(n)] += lazy[n];
+                lazy[lc(n)] += lazy[n];
+                lazy[rc(n)] += lazy[n];
             }
             lazy[n] = 0;
         }
         if (l > j || r < i)
             return 0;
         if (l < i || r > j)
-            return queryUtil(lChld(n), l, m, i, j)
-            + queryUtil(rChld(n), m+1, r, i, j);
+            return queryUtil(lc(n), l, m, i, j)
+            + queryUtil(rc(n), m+1, r, i, j);
         return A[n];
     }
 public:
-    void init(vector<llint>& v) {
+    void init(vector<ll>& v) {
         N = v.size();
         A.assign(ceilPow2(N)<<1, 0);
         lazy.assign(A.size(), 0);
         initUtil(1, 0, N-1, v);
     }
-    void add(int i, int j, llint x) {
+    void add(int i, int j, ll x) {
         addUtil(1, 0, N-1, i, j, x);
     }
-    llint query(int i, int j) {
+    ll query(int i, int j) {
         return queryUtil(1, 0, N-1, i, j);
     }
 } segt;
@@ -89,8 +89,9 @@ public:
 int main() {
     ios::sync_with_stdio(0);
     cin.tie(0); cout.tie(0);
-    vector<llint> v;
-    int N, M, K, q, i, j, x;
+    vector<ll> v;
+    int N, M, K, q, i, j;
+    ll x;
 
     cin >> N >> M >> K;
     v.resize(N+1);
