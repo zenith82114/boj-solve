@@ -1,38 +1,34 @@
 /*
  * Q9019 - Bidirectional BFS
- * Date: 2021.7.25
+ * Date: 2021.7.25, 2022.3.15
  */
 
-#include<iostream>
-#include<algorithm>
-#include<queue>
+#include<bits/stdc++.h>
 using namespace std;
 
 constexpr int FROM_A = 1, FROM_B = 0, NONE = -1;
 const char OP[5] = { 'D','D','S','L','R' };
-char op_pred[10000], op_succ[10000], path[10000];
-int pred[10000], succ[10000], neighbors[5];
+char op_pred[10000];
+int pred[10000], neighbors[5];
 int visitor[10000];
 
-int main()
-{
-    ios::sync_with_stdio(0); cin.tie(0);
-    int TC;
-    int A, B, n, m, nn, v;
-    bool done;
+int main() {
+    ios::sync_with_stdio(0);
+    cin.tie(0); cout.tie(0);
+    int TC, A, B;
 
     cin >> TC;
     while (TC--) {
         queue<int> Q;
-        fill_n(visitor, 10000, NONE);
+        memset(visitor, NONE, sizeof visitor);
         cin >> A >> B;
         visitor[A] = FROM_A; Q.push(A);
         visitor[B] = FROM_B; Q.push(B);
 
-        done = false;
+        bool done = false;
         while (!done) {
-            n = Q.front(); Q.pop();
-            v = visitor[n];
+            int n = Q.front(); Q.pop();
+            int v = visitor[n];
             if (v == FROM_A) {
                 neighbors[1] = (n << 1) % 10000;
                 neighbors[2] = n ? n - 1 : 9999;
@@ -49,31 +45,30 @@ int main()
             for (int i = v; i < 5; ++i) {
                 if (i < 2 && (n & 1) && v == FROM_B)
                     continue;
-                nn = neighbors[i];
+                int nn = neighbors[i];
                 if (visitor[nn] == v)
                     continue;
-                if (v == FROM_A) {
+                else if (visitor[nn] == NONE) {
+                    visitor[nn] = v;
                     pred[nn] = n;
                     op_pred[nn] = OP[i];
-                } else {
-                    succ[nn] = n;
-                    op_succ[nn] = OP[i];
-                }
-                if (visitor[nn] == NONE) {
-                    visitor[nn] = v;
                     Q.push(nn);
-                } else {
-                    m = 0;
-                    n = nn;
-                    while (n != A) {
-                        path[m++] = op_pred[n];
-                        n = pred[n];
+                }
+                else {
+                    int a = n, b = nn;
+                    string s;
+                    if (v == FROM_B)
+                        swap(a, b);
+                    while (a != A) {
+                        s.push_back(op_pred[a]);
+                        a = pred[a];
                     }
-                    for (; m > 0; cout << path[--m]);
-                    n = nn;
-                    while (n != B) {
-                        cout << op_succ[n];
-                        n = succ[n];
+                    for (auto rit = s.rbegin(); rit != s.rend(); ++rit)
+                        cout << *rit;
+                    cout << OP[i];
+                    while (b != B) {
+                        cout << op_pred[b];
+                        b = pred[b];
                     }
                     cout << '\n';
                     done = true;
