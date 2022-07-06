@@ -4,6 +4,10 @@ if [ "$#" -ne 1 ]; then
     echo "Usage: $0 [problem number]"
 	exit 1
 fi
+if [ ! -f "$1.cpp" ]; then
+    echo "$1.cpp does not exist!"
+    exit 1
+fi
 if [ ! -f "./input.txt" ]; then
     echo "input.txt does not exist!"
     exit 1
