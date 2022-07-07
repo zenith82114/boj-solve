@@ -1,6 +1,6 @@
 /*
  * Q11378 - Advanced bipartite matching as network flow
- * Date: 2022.1.26
+ * Date: 2022.1.26, 2022.7.7(revised)
  */
 
 #include<iostream>
@@ -8,20 +8,20 @@
 #include<queue>
 using namespace std;
 
-array<array<int, 2003>, 2003> G{};
+array<vector<int>, 2003> adj;
+array<array<int, 2003>, 2003> cap;
 array<bool, 2003> visited;
 array<int, 2003> pred;
 
 bool bfs(int S, int T) {
     queue<int> q;
-    int u, v;
     q.push(S);
     visited.fill(false);
     visited[S] = true;
     while (!q.empty()) {
-        u = q.front(); q.pop();
-        for (v = 0; v <= T; v++) {
-            if (!visited[v] && G[u][v] > 0) {
+        int u = q.front(); q.pop();
+        for (int& v : adj[u]) {
+            if (!visited[v] && cap[u][v] > 0) {
                 if (v == T) {
                     pred[T] = u;
                     return true;
@@ -35,31 +35,45 @@ bool bfs(int S, int T) {
     return false;
 }
 
-int main() {
-    cin.tie(0)->sync_with_stdio(0);
-    int N, M, K, T, l, n, m, C;
+#define person(i) (i+1)
+#define work(i) (i+N+1)
 
-    cin >> N >> M >> K;
-    T = N+M+2;
-    G[0][T-1] = K;
-    for (n = 1; n <= N; n++) {
-        G[0][n] = 1;
-        G[T-1][n] = K;
+inline void add_edge(int from, int to, int c) {
+    adj[from].emplace_back(to);
+    adj[to].emplace_back(from);
+    cap[from][to] = c;
+    cap[to][from] = 0;
+}
+
+int main() {
+    ios::sync_with_stdio(0);
+    cin.tie(0), cout.tie(0);
+
+    int N, M, K; cin >> N >> M >> K;
+    const int S = 0;
+    const int B = 1;
+    const int T = N+M+2;
+    int l, m;
+
+    add_edge(S, B, K);
+    for (int n = 1; n <= N; n++) {
+        add_edge(S, person(n), 1);
+        add_edge(B, person(n), K);
         cin >> l;
         while (l--) {
             cin >> m;
-            G[n][m+N] = 1;
+            add_edge(person(n), work(m), 1);
         }
     }
-    for (m = 1; m <= M; m++)
-        G[m+N][T] = 1;
+    for (int m = 1; m <= M; m++)
+        add_edge(work(m), T, 1);
 
-    C = 0;
-    while (bfs(0, T)) {
+    int C = 0;
+    while (bfs(S, T)) {
         C++;
-        for (int v = T; v != 0; v = pred[v]) {
-            G[pred[v]][v]--;
-            G[v][pred[v]]++;
+        for (int v = T; v != S; v = pred[v]) {
+            cap[pred[v]][v]--;
+            cap[v][pred[v]]++;
         }
     }
 
