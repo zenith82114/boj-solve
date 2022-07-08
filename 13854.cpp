@@ -105,7 +105,7 @@ void ctd(int pc, int u, vector<cpx>& vd, vector<int>& vl) {
         // paths one of whose endpoints is the centroid
         for (int i=0; i<nv; i++)
             for (int k=0; k<K; k++)
-                vl[k] += (int)vvd[i][k].real();
+                vl[k] += (int)round(vvd[i][k].real());
 
         // paths whose endpoints belong to different subtrees
         if (nv > 1) {
@@ -117,7 +117,7 @@ void ctd(int pc, int u, vector<cpx>& vd, vector<int>& vl) {
                         tvl[k] = vvd[i][k] * vvd[j][k];
                     fft(tvl, true);
                     for (int k=0; k<K; k++)
-                        vl[k] += round(tvl[k].real());
+                        vl[k] += (int)round(tvl[k].real());
                 }
             }
         }
