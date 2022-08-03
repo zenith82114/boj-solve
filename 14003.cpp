@@ -1,36 +1,33 @@
 /*
  * Q14003 - LIS using binary search
- * Date: 2021.8.25
+ * Date: 2021.8.25, 2022.8.4
  */
 
 #include<iostream>
 #include<algorithm>
+#include<vector>
 using namespace std;
 
-constexpr int MAX = 1000000;
-int A[MAX], least_last[MAX], pos[MAX];
-
-int main()
-{
+int main() {
     ios::sync_with_stdio(0); cin.tie(0);
 
-    int N, L, maxL = 0, *p;
-    cin >> N;
-    fill_n(pos, N, 0);
-    for (int n = 0; n < N; ++n) {
-        cin >> A[n];
-        p = lower_bound(least_last, least_last + maxL, A[n]);
-        *p = A[n];
-        pos[n] = distance(least_last, p);
-        if (p == least_last + maxL) maxL++;
+    int N; cin >> N;
+    vector<int> arr(N), last, pos(N);
+    for (int i = 0; i < N; ++i) {
+        cin >> arr[i];
+        auto p = lower_bound(last.begin(), last.end(), arr[i]);
+        pos[i] = distance(last.begin(), p);
+        if (p != last.end())
+            *p = arr[i];
+        else
+            last.emplace_back(arr[i]);
     }
-    cout << maxL << endl;
-    L = maxL - 1;
-    while (L != -1) {
-        if (pos[--N] == L)
-            least_last[L--] = A[N];
-    }
-    for (L = 0; L < maxL; cout << least_last[L++] << " ");
+
+    cout << last.size() << '\n';
+    for (int i = N-1, j = last.size()-1; ~i; --i)
+        if (pos[i] == j)
+            last[j--] = arr[i];
+    for (int& a : last) cout << a << ' ';
     cout << '\n';
 
     return 0;
