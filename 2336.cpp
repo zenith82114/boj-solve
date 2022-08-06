@@ -1,5 +1,5 @@
 /*
- * Q2336 - Implicit segment tree
+ * Q2336 - Bottom-up segment tree
  * Date: 2022.5.24
  */
 
