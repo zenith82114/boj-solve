@@ -1,6 +1,6 @@
 /*
  * Q2927 - HLD + Union-find + BIT
- * Date: 2022.7.8
+ * Date: 2022.7.8, 2022.8.30(revised)
  */
 
 #include<bits/stdc++.h>
@@ -36,25 +36,26 @@ void hld_dfs2(int u, int cn, int cd, int& bi) {
 }
 
 // Union-find
-vector<int> uf_par, uf_rnk;
+vector<int> uf_arr;
 int find(int x) {
-    while (x != uf_par[x])
-        x = uf_par[x];
-    return x;
+    if (uf_arr[x] < 0)
+        return x;
+    return uf_arr[x] = find(uf_arr[x]);
 }
 bool connected(int x, int y) {
     return find(x) == find(y);
 }
 bool link(int x, int y) {
-    int X = find(x), Y = find(y);
-    if (X == Y)
+    x = find(x);
+    y = find(y);
+    if (x == y)
         return false;
-    if (uf_rnk[X] < uf_rnk[Y])
-        uf_par[X] = Y;
+    if (uf_arr[x] < uf_arr[y])
+        uf_arr[y] = x;
     else {
-        uf_par[Y] = X;
-        if (uf_rnk[X] == uf_rnk[Y])
-            uf_rnk[X]++;
+        if (uf_arr[x] == uf_arr[y])
+            uf_arr[y]--;
+        uf_arr[x] = y;
     }
     return true;
 }
@@ -105,9 +106,7 @@ int main() {
         cin >> data[n];
 
     adj.resize(N+1);
-    uf_par.resize(N+1);
-    iota(uf_par.begin(), uf_par.end(), 0);
-    uf_rnk.resize(N+1);
+    uf_arr.resize(N+1, -1);
 
     int M; cin >> M;
     queries.resize(M);
@@ -145,8 +144,7 @@ int main() {
     for (int u = 1; u <= N; u++) if (!ch_no[u])
         hld_dfs2(u, u, 0, bi);
 
-    iota(uf_par.begin(), uf_par.end(), 0);
-    for (int& rnk : uf_rnk) rnk = 0;
+    fill(uf_arr.begin(), uf_arr.end(), -1);
     BIT bit(data);
 
     for (auto& q : queries) {
