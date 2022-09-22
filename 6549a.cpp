@@ -1,14 +1,11 @@
 /*
- * Q6549a - Monotonic stack
- * Date: 2022.3.13
+ * Q6549a - Monotone stack
+ * Date: 2022.3.13, 2022.9.22(revised)
  */
 
 #include<bits/stdc++.h>
 using namespace std;
 using pii = pair<int, int>;
-
-vector<pii> stk;
-int sz;
 
 int main() {
     ios::sync_with_stdio(0);
@@ -18,21 +15,23 @@ int main() {
     while (N) {
         int h, nb, hb;
         ulong M = 0;
-        stk.clear(); sz = 0;
+        stack<pii> stk;
         for (int n = 0; n < N; ++n) {
-            cin >> h;
-            nb = n;
-            while (sz && h < stk.back().second) {
-                tie(nb, hb) = stk.back();
-                stk.pop_back(); sz--;
-                M = max(M, (ulong)hb * (n - nb));
+            int h; cin >> h;
+            int nb = n;
+            while (!stk.empty() && h < stk.top().second) {
+                nb = stk.top().first;
+                int hb = stk.top().second;
+                M = max(M, 1ul * hb * (n - nb));
+                stk.pop();
             }
-            stk.emplace_back(nb, h); sz++;
+            stk.emplace(nb, h);
         }
-        while (sz--) {
-            tie(nb, hb) = stk.back();
-            stk.pop_back();
-            M = max(M, (ulong)hb * (N - nb));
+        while (!stk.empty()) {
+            int nb = stk.top().first;
+            int hb = stk.top().second;
+            M = max(M, 1ul * hb * (N - nb));
+            stk.pop();
         }
         cout << M << '\n';
         cin >> N;
