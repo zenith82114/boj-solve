@@ -1,5 +1,5 @@
 /*
- * Q11378 - Advanced bipartite matching as network flow
+ * Q11378 - Advanced bipartite matching as maximum flow
  * Date: 2022.1.26, 2022.7.7(revised)
  */
 
