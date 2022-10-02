@@ -1,6 +1,6 @@
 /*
- * Q1786 - KMP matching
- * Date: 2021.8.15
+ * Q1786 - Knuth-Morris-Pratt alg.
+ * Date: 2021.8.15, 2022.10.2(revised)
  */
 
 #include<iostream>
@@ -8,39 +8,33 @@
 #include<vector>
 using namespace std;
 
-constexpr int maxN = 1000000, maxM = 1000000;
-int border[maxM + 1] = { 0 };
+int main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr); cout.tie(nullptr);
 
-int main()
-{
-    ios_base::sync_with_stdio(0); cin.tie(0);
-    string T, P;
-    int N, M, i, j;
-    vector<int> matches;
+    string T; getline(cin, T);
+    int M = T.length();
+    string P; getline(cin, P);
+    int N = P.length();
+    P.push_back('#');
 
-    getline(cin, T); N = T.length();
-    getline(cin, P); M = P.length();
-
-    j = 0;
-    for (i = 1; i <= M; ++i) {
-        while (j && P[j] != P[i])
-            j = border[j];
-        if (P[j] == P[i]) j++;
-        border[i + 1] = j;
+    vector<int> pf(N);
+    for (int i = 1, j = 0; i < N; ++i) {
+        while (j && P[i] != P[j])
+            j = pf[j-1];
+        if (P[i] == P[j]) ++j;
+        pf[i] = j;
     }
-    j = 0;
-    for (i = 0; i <= N; ++i) {
-        while (j && P[j] != T[i])
-            j = border[j];
-        if (P[j] == T[i]) j++;
-        if (j == M) {
-            matches.push_back(i - M + 2);
-            j = border[j];
-        }
-    }
-    cout << matches.size() << '\n';
-    for (int& m : matches) cout << m << ' ';
-    cout << '\n';
 
+    vector<int> ans;
+    for (int i = 0, j = 0; i < M; ++i) {
+        while (j && T[i] != P[j])
+            j = pf[j-1];
+        if (T[i] == P[j]) ++j;
+        if (j == N) ans.emplace_back(i -N +1);
+    }
+
+    cout << ans.size() << '\n';
+    for (const int &a : ans) cout << (a+1) << ' ';
     return 0;
 }
