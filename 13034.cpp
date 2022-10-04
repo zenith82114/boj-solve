@@ -10,7 +10,7 @@ vector<int> g;
 
 int G(int n) {
     int &ret = g[n];
-    if (g[n] != -1)
+    if (ret != -1)
         return ret;
 
     set<int> s;
