@@ -51,8 +51,8 @@ int main() {
     while (TC--) {
         cin >> N >> M;
         if (N > 0 && M > 1 && M <= N+1) {
-            r1 = combModLarge(N-1, M+2, p1);
-            r2 = combModLarge(N-1, M+2, p2);
+            r1 = combModLarge(N-1, N-M+1, p1);
+            r2 = combModLarge(N-1, N-M+1, p2);
             r = ((p1*q2*r2) + (p2*q1*r1)) % P;
             cout << r << '\n';
         }
