@@ -6,8 +6,6 @@
 #include<bits/stdc++.h>
 using namespace std;
 
-using ii = pair<int, int>;
-
 class union_find {
     vector<int> par, rnk;
 public:
