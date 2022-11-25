@@ -1,12 +1,18 @@
 
-## boj-solve - PS in C++
+# boj-solve - PS in C++
 
-#### Problem source
+## Environment
+
+Ubuntu 20.04.5 LTS
+gcc version 9.4.0
+std version c++17
+
+## Problem source
 
 [Baekjoon Online Judge](https://www.acmicpc.net)
 
-#### Using `run.sh`
+## Usage of `run.sh`
 
-Usage: `./run.sh {problem number}.cpp`<br>
-Be sure you are using a Bash shell and have `input.txt` ready in the directory.<br>
-It will be redirected to the standard input of the program.
+`./run.sh {problem number}.cpp`
+
+Be sure to prepare your input in `./input.txt`.
