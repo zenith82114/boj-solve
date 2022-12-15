@@ -14,7 +14,7 @@ if [ ! -f "./input.txt" ]; then
 fi
 
 echo "Compiling $1..."
-g++ -std=c++17 -Wall -O3 $1 -o solve
+g++-11 -std=c++17 -Wall -O3 $1 -o solve
 
 echo "Running..."
 echo -e "================================"

@@ -3,9 +3,9 @@
 
 ## Environment
 
-Ubuntu 20.04.5 LTS
-gcc version 9.4.0
-std version c++17
+- Ubuntu 20.04.5 LTS
+- gcc 11.1.0
+- std c++17
 
 ## Problem source
 
@@ -15,4 +15,4 @@ std version c++17
 
 `./run.sh {problem number}.cpp`
 
-Be sure to prepare your input in `./input.txt`.
+Be sure to prepare your input in repo root as `input.txt`.
