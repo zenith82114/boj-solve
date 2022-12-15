@@ -19,7 +19,7 @@ struct vec2 {
 };
 struct Segment {
     vec2 p1, p2;
-}segm[MAX];
+} segm[MAX];
 
 int64_t cross(const vec2& v, const vec2& w) {
     return v.x*w.y - v.y*w.x;
@@ -28,8 +28,7 @@ int ccw(const vec2& o, const vec2& p, const vec2& q) {
     auto k = cross(p-o, q-o);
     return (k < 0) ? -1 : (k > 0);
 }
-bool intersects(int i, int j)
-{
+bool intersects(int i, int j) {
     vec2 &a = segm[i].p1, &b = segm[i].p2;
     vec2 &c = segm[j].p1, &d = segm[j].p2;
     int ab = ccw(a,b,c) * ccw(a,b,d);
@@ -43,56 +42,48 @@ bool intersects(int i, int j)
 }
 
 struct Data {
-    int parent, height, groupSize;
-}db[MAX];
-int leader(int x)
-{
-    int& p = db[x].parent;
+    int par, rnk, sz;
+} db[MAX];
+
+int find(int x) {
+    int& p = db[x].par;
     if (x == p) return p;
-    return p = leader(p);
+    return p = find(p);
 }
-bool sameGroup(int x, int y)
-{
-    return leader(x) == leader(y);
-}
-int unite(int x, int y)
-{
-    int X = leader(x), Y = leader(y);
+int unite(int x, int y) {
+    int X = find(x), Y = find(y);
     Data& dX = db[X], & dY = db[Y];
     if (X == Y) return 0;
-    int& hX = dX.height, & hY = dY.height;
+    int& hX = dX.rnk, & hY = dY.rnk;
     if (hX < hY) {
-        dX.parent = Y;
-        return dY.groupSize += dX.groupSize;
+        dX.par = Y;
+        return dY.sz += dX.sz;
     } else {
-        dY.parent = X;
+        dY.par = X;
         if (hX == hY) hX++;
-        return dX.groupSize += dY.groupSize;
+        return dX.sz += dY.sz;
     }
 }
-int main()
-{
-    ios_base::sync_with_stdio(0); cin.tie(0);
-    int N, n, m;
-    int nG, maxGsize = 1;
-    Segment* s;
 
-    cin >> N; nG = N;
-    for (n = 0; n < N; ++n) {
-        db[n].parent = n;
-        db[n].height = 0;
-        db[n].groupSize = 1;
-        s = &segm[n];
-        cin >> s->p1.x >> s->p1.y
-            >> s->p2.x >> s->p2.y;
-        for (m = 0; m < n; ++m) {
-            if (!sameGroup(m, n) && intersects(m, n)) {
+int main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr); cout.tie(nullptr);
+
+    int N; cin >> N;
+    int nG = N;
+    int maxG = 1;
+    for (int n = 0; n < N; ++n) {
+        db[n] = {n, 0, 1};
+        auto& s = segm[n];
+        cin >> s.p1.x >> s.p1.y >> s.p2.x >> s.p2.y;
+        for (int m = 0; m < n; ++m) {
+            if (find(m) != find(n) && intersects(m, n)) {
                 nG--;
-                maxGsize = max(maxGsize, unite(m, n));
+                maxG = max(maxG, unite(m, n));
             }
         }
     }
-    cout << nG << '\n' << maxGsize << '\n';
 
+    cout << nG << '\n' << maxG << '\n';
     return 0;
 }

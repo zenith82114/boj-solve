@@ -7,25 +7,28 @@
 #include<deque>
 using namespace std;
 
-struct Element { int64_t val; int idx; };
+struct Element {
+    int64_t val; int idx;
+    Element(int64_t v, int i): val(v), idx(i) {}
+};
 deque<Element> dq;
 
 int main() {
-    cin.tie(0)->sync_with_stdio(0);
-    int N, D;
-    int64_t a, M;
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr); cout.tie(nullptr);
 
-    cin >> N >> D >> a;
-    dq.push_back({a, 0});
-    M = a;
-    for (int n = 1; n < N; n++) {
+    int N, D; cin >> N >> D;
+    int64_t a; cin >> a;
+    dq.emplace_back(a, 0);
+    int64_t M = a;
+    for (int n = 1; n < N; ++n) {
         cin >> a;
         a = max(a, a + dq.front().val);
         while (!dq.empty() && dq.back().val <= a)
             dq.pop_back();
         if (!dq.empty() && dq.front().idx + D == n)
             dq.pop_front();
-        dq.push_back({a, n});
+        dq.emplace_back(a, n);
         M = max(M, dq.front().val);
     }
 

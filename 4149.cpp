@@ -6,7 +6,7 @@
 #include<bits/stdc++.h>
 using namespace std;
 
-ulong mulMod(const ulong A, const ulong B, const ulong p) {
+ulong mul_mod(const ulong A, const ulong B, const ulong p) {
     ulong a = A%p;
     ulong b = B%p;
     ulong r = b&1 ? a : 0;
@@ -17,44 +17,44 @@ ulong mulMod(const ulong A, const ulong B, const ulong p) {
     }
     return r;
 }
-ulong powMod(const ulong A, const ulong B, const ulong p) {
+ulong pow_mod(const ulong A, const ulong B, const ulong p) {
     ulong a = A%p;
     ulong b = B;
     ulong r = b&1 ? a : 1;
     while (b >>= 1) {
-        a = mulMod(a, a, p);
+        a = mul_mod(a, a, p);
         if (b&1)
-            r = mulMod(a, r, p);
+            r = mul_mod(a, r, p);
     }
     return r;
 }
 default_random_engine gen;
-bool probablePrime(const ulong p, const ulong q, const ulong r,
+bool probable_prime(const ulong p, const ulong q, const ulong r,
 uniform_int_distribution<ulong>& dist) {
     ulong x, y;
     x = dist(gen);
-    y = powMod(x, q, p);
+    y = pow_mod(x, q, p);
     if (y == 1)
         return true;
-    for (ulong i = 0; i < r; i++) {
+    for (ulong i = 0; i < r; ++i) {
         if (y == p-1)
             return true;
-        y = mulMod(y, y, p);
+        y = mul_mod(y, y, p);
         if (y == 1)
             return false;
     }
     return false;
 }
 constexpr int trial = 20;
-bool MillerRabin(ulong p) {
+bool miller_rabin(ulong p) {
     uniform_int_distribution<ulong> dist(2, p-1);
     ulong q = p-1, r = 0;
         while (!(q&1)) {
         q >>= 1;
         r++;
     }
-    for (int i = 0; i < trial; i++) {
-        if (!probablePrime(p, q, r, dist))
+    for (int i = 0; i < trial; ++i) {
+        if (!probable_prime(p, q, r, dist))
             return false;
     }
     return true;
@@ -64,7 +64,7 @@ inline ulong diff(ulong x, ulong y) {
     return x>y ? x-y : y-x;
 }
 inline ulong G(ulong x, ulong N) {
-    return (mulMod(x, x, N)+1)%N;
+    return (mul_mod(x, x, N)+1)%N;
 }
 ulong gcd(ulong a, ulong b) {
     while (b) {
@@ -73,15 +73,15 @@ ulong gcd(ulong a, ulong b) {
     }
     return a;
 }
-void findFactor(ulong N, vector<ulong>& v) {
-    ulong x, y, p;
-    if (MillerRabin(N)) {
+void factorize(ulong N, vector<ulong>& v) {
+    if (miller_rabin(N)) {
         v.push_back(N);
         return;
     }
     // Pollard rho
-    for (ulong i = 1; i <= N; i++) {
-        x = y = i;
+    ulong p;
+    for (ulong i = 1; i <= N; ++i) {
+        ulong x = i, y = i;
         p = 1;
         while (p == 1) {
             x = G(x, N);
@@ -93,15 +93,15 @@ void findFactor(ulong N, vector<ulong>& v) {
     }
     // success: recurse
     if (p != N) {
-        findFactor(p, v);
-        findFactor(N/p, v);
+        factorize(p, v);
+        factorize(N/p, v);
     }
     // failure: bruteforce
     else {
         for (p = 3; p*p <= N; p += 2) {
             if (N%p == 0) {
                 v.push_back(p);
-                findFactor(N/p, v);
+                factorize(N/p, v);
                 return;
             }
         }
@@ -111,19 +111,17 @@ void findFactor(ulong N, vector<ulong>& v) {
 }
 
 int main() {
-    cin.tie(0)->sync_with_stdio(0);
-    vector<ulong> v;
-    ulong N;
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr); cout.tie(nullptr);
 
-    cin >> N;
+    ulong N; cin >> N;
+    vector<ulong> v;
     while (!(N&1)) {
         N >>= 1;
         v.push_back(2);
     }
-    if (N > 1)
-        findFactor(N, v);
+    if (N > 1) factorize(N, v);
     sort(v.begin(), v.end());
-    for (auto& p : v)
-        cout << p << '\n';
+    for (auto& p : v) cout << p << '\n';
     return 0;
 }

@@ -1,6 +1,6 @@
 /*
  * Q7626 - Union area of rectangles using sweep line + segment tree
- * Date: 2022.1.6, 2022.3.13(revised)
+ * Date: 2022.1.6
  */
 
 #include<iostream>
@@ -9,7 +9,7 @@
 using namespace std;
 
 struct Edge {
-    bool isLeftEdge;
+    bool is_left;
     int x;
     int y1, y2;
     bool operator<(const Edge &e) {
@@ -20,51 +20,43 @@ vector<Edge> edges;
 
 // coordinate compression
 vector<int> Ys;
-int yCoordToIndex(int y) {
+int y_to_idx(int y) {
     return distance(Ys.begin(), lower_bound(Ys.begin(), Ys.end(), y));
 }
-int yIndexToCoord(int i) {
+int idx_to_y(int i) {
     return Ys[i];
 }
 
-class SegTree {
+class seg_tree {
     int N;
     vector<int> cnt, len;
-    constexpr int ceil_pow2(int n) {
-        if (n & (n - 1)) {
-            for (int i = 1; i < 32; i <<= 1)
-                n |= (n >> i);
-            return n + 1;
-        }
-        return n;
-    }
-    constexpr int lChild(int n) { return n << 1; }
-    constexpr int rChild(int n) { return n << 1 | 1; }
-    void addRangeUtil(int n, int l, int r, int i, int j, int k) {
+    int lc(int n) { return n << 1; }
+    int rc(int n) { return n << 1 | 1; }
+    void add_range_util(int n, int l, int r, int i, int j, int k) {
         int m = (l + r) >> 1;
         if (l > j || r < i)
             return;
         if (l < i || r > j) {
-            addRangeUtil(lChild(n), l, m, i, j, k);
-            addRangeUtil(rChild(n), m+1, r, i, j, k);
+            add_range_util(lc(n), l, m, i, j, k);
+            add_range_util(rc(n), m+1, r, i, j, k);
         }
         else cnt[n] += k;
         if (cnt[n])
-            len[n] = yIndexToCoord(r+1) - yIndexToCoord(l);
+            len[n] = idx_to_y(r+1) - idx_to_y(l);
         else if (l != r)
-            len[n] = len[lChild(n)] + len[rChild(n)];
+            len[n] = len[lc(n)] + len[rc(n)];
         else
             len[n] = 0;
     }
 public:
-    SegTree(int _N) {
-        int size = ceil_pow2(_N) << 1;
-        N = _N;
-        cnt.assign(size, 0);
-        len.assign(size, 0);
+    seg_tree(int sz) {
+        N = 1;
+        while (N < sz) N <<= 1;
+        cnt.assign(N<<1, 0);
+        len.assign(N<<1, 0);
     }
-    void addRange(int i, int j, int k) {
-        addRangeUtil(1, 0, N-1, i, j, k);
+    void add_range(int i, int j, int k) {
+        add_range_util(1, 0, N-1, i, j, k);
     }
     int query() {
         return len[1];
@@ -72,14 +64,14 @@ public:
 };
 
 int main() {
-    ios::sync_with_stdio(0); cin.tie(0);
-    int N, x1, x2, y1, y2, x_prev;
-    ulong L, S;
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr); cout.tie(nullptr);
 
-    cin >> N;
+    int N; cin >> N;
     edges.resize(N<<1);
     Ys.resize(N<<1);
-    for (int i = 0; i < N; i++) {
+    for (int i = 0; i < N; ++i) {
+        int x1, x2, y1, y2;
         cin >> x1 >> x2 >> y1 >> y2;
         edges[i<<1]     = { true, x1, y1, y2 };
         edges[i<<1 | 1] = { false, x2, y1, y2 };
@@ -90,15 +82,15 @@ int main() {
     sort(Ys.begin(), Ys.end());
     Ys.erase(unique(Ys.begin(), Ys.end()), Ys.end());
 
-    SegTree segt(Ys.size());
-    x_prev = 0;
-    L = S = 0;
-    for (auto& edge : edges) {
+    seg_tree segt(Ys.size());
+    int x_prev = 0;
+    uint64_t L = 0ul, S = 0ul;
+    for (const auto& edge : edges) {
         S += L * (edge.x - x_prev);
         x_prev = edge.x;
-        segt.addRange(
-            yCoordToIndex(edge.y1), yCoordToIndex(edge.y2)-1,
-            edge.isLeftEdge ? 1 : -1);
+        segt.add_range(
+            y_to_idx(edge.y1), y_to_idx(edge.y2)-1,
+            edge.is_left ? 1 : -1);
         L = segt.query();
     }
 

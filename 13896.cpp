@@ -23,12 +23,6 @@ void dfs(int pu, int u) {
     }
 }
 
-inline int lg(int n) {
-    int k = 0;
-    for (; n > 1; n >>= 1) ++k;
-    return k;
-}
-
 int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr); cout.tie(nullptr);
@@ -50,7 +44,11 @@ int main() {
         dep[0] = -1;
         dfs(0, 1);
 
-        const int lgN = lg(N);
+        const int lgN = [](int n) {
+            int k = 0;
+            for (; n > 1; n >>= 1) ++k;
+            return k;
+        }(N);
         for (int i = 1; i <= lgN; ++i)
         for (int u = 1; u <= N; ++u)
             par[i][u] = par[i-1][par[i-1][u]];

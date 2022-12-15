@@ -6,14 +6,14 @@
 #include<bits/stdc++.h>
 using namespace std;
 
-class SplayTree {
-    struct Node {
+class splay_tree {
+    struct node {
         int val, sz, val_min, val_max;
         bool rev;
-        Node *l, *r, *p;
-        Node(int v) :
+        node *l, *r, *p;
+        node(int v) :
             val(v), rev(false), l(nullptr), r(nullptr), p(nullptr) {}
-        ~Node() {
+        ~node() {
             if (l) delete l;
             if (r) delete r;
         }
@@ -40,9 +40,9 @@ class SplayTree {
         }
     } *root;
     int N;
-    void rotate(Node *x) {
-        Node *px = x->p;
-        Node *y;
+    void rotate(node *x) {
+        node *px = x->p;
+        node *y;
         if (x == px->l) {
             px->l = y = x->r;
             x->r = px;
@@ -61,8 +61,8 @@ class SplayTree {
         px->update();
         x->update();
     }
-    void splay(Node *x) {
-        Node *px, *gx;
+    void splay(node *x) {
+        node *px, *gx;
         while (x->p) {
             px = x->p;
             gx = px->p;
@@ -74,8 +74,8 @@ class SplayTree {
             rotate(x);
         }
     }
-    Node *find_index(int i) {
-        Node *x = root; x->lazy();
+    node *find_index(int i) {
+        node *x = root; x->lazy();
         while (true) {
             while (x->l && i < x->l->sz) {
                 x = x->l; x->lazy();
@@ -89,8 +89,8 @@ class SplayTree {
         splay(x);
         return x;
     }
-    Node *find_value(Node *x, int v) {
-        Node *y = nullptr;
+    node *find_value(node *x, int v) {
+        node *y = nullptr;
         x->lazy();
         if (v == x->val) {
             splay(x);
@@ -102,9 +102,9 @@ class SplayTree {
             y = find_value(x->r, v);
         return y;
     }
-    Node *find_interval(int i, int j) {
+    node *find_interval(int i, int j) {
         find_index(i-1);
-        Node *x = root;
+        node *x = root;
         root = x->r;
         root->p = nullptr;
         find_index(j-i+1);
@@ -114,21 +114,21 @@ class SplayTree {
         return root->r->l;
     }
     void flip_interval(int i, int j) {
-        Node *x = find_interval(i, j);
+        node *x = find_interval(i, j);
         x->rev = !x->rev;
     }
 public:
     void init(vector<int>& V) {
         N = V.size();
         if (root) delete root;
-        root = new Node(0);
-        Node *x = root;
+        root = new node(0);
+        node *x = root;
         for (int& v : V) {
-            x->r = new Node(v);
+            x->r = new node(v);
             x->r->p = x;
             x = x->r;
         }
-        x->r = new Node(N+1);
+        x->r = new node(N+1);
         x->r->p = x;
         x = x->r;
         while (x) {
@@ -137,7 +137,7 @@ public:
         }
     }
     void solve() {
-        for (int i=1; i<=N; ++i) {
+        for (int i = 1; i <= N; ++i) {
             int m = find_interval(i, N)->val_min;
             int j = find_value(root, m)->l->sz;
             flip_interval(i, j);
@@ -148,27 +148,21 @@ public:
 } splayt;
 
 int main() {
-    ios::sync_with_stdio(0);
-    cin.tie(0), cout.tie(0);
-    int N, M;
-    vector<int> V, C;
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr), cout.tie(nullptr);
 
-    cin >> N;
+    int N; cin >> N;
     while (N) {
-        V.resize(N);
-        M = 0;
-        for (int i=0; i<N; ++i) {
+        vector<int> V(N);
+        int M = 0;
+        for (int i = 0; i < N; ++i) {
             cin >> V[i];
             M = max(M, V[i]);
         }
-        C.resize(M+1);
-        fill(C.begin(), C.end(), 0);
-        for (int i=0; i<N; ++i)
-            ++C[V[i]];
-        for (int i=0; i<M; ++i)
-            C[i+1] += C[i];
-        for (int i=N-1; ~i; --i)
-            V[i] = C[V[i]]--;
+        vector<int> C(M+1, 0);
+        for (int i = 0; i < N; ++i) ++C[V[i]];
+        for (int i = 0; i < M; ++i) C[i+1] += C[i];
+        for (int i = N-1; ~i; --i) V[i] = C[V[i]]--;
 
         splayt.init(V);
         splayt.solve();

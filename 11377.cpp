@@ -25,9 +25,7 @@ bool bfs(int s, int t, vector<pii> &pred) {
     visited[s] = true;
     while (!q.empty()) {
         int u = q.front(); q.pop();
-        for (const auto &e : adj[u]) {
-            const int &v = e.first;
-            const int &z = e.second;
+        for (const auto& [v, z] : adj[u]) {
             if (!visited[v] && cap[z] > 0) {
                 pred[v] = make_pair(u, z);
                 if (v == t)

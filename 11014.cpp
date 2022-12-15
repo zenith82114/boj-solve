@@ -26,17 +26,15 @@ bool match(int x) {
 }
 
 int main() {
-    cin.tie(0)->sync_with_stdio(0);
-    vector<int> X;
-    int TC, N, M, v, S;
-    char c;
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr); cout.tie(nullptr);
 
-    cin >> TC;
+    int TC; cin >> TC;
     while (TC--) {
-        cin >> N >> M;
-        S = 0;
-        for (v = 0; v < N*M; v++) {
-            cin >> c;
+        int N, M; cin >> N >> M;
+        int S = 0;
+        for (int v = 0; v < N*M; ++v) {
+            char c; cin >> c;
             if (c == '.') {
                 B[v] = true;
                 S++;
@@ -44,10 +42,10 @@ int main() {
             else B[v] = false;
         }
 
-        X.clear();
-        for (int n = 0; n < N; n++) {
+        vector<int> X;
+        for (int n = 0; n < N; ++n) {
             for (int m = 1; m < M; m += 2) {
-                v = n*M + m;
+                int v = n*M + m;
                 if (B[v]) {
                     G[v].clear();
                     if (m > 0) {

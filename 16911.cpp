@@ -55,50 +55,40 @@ void rollback(int z) {
 
 // DnC
 vector<vector<pii>> E;
-inline int ceil_pow2(int n) {
-    if (n & (n-1)) {
-        for (int i=1; i<32; i<<=1)
-            n |= (n>>i);
-        return n+1;
-    }
-    return n;
-}
 inline int lc(int n) { return n<<1; }
 inline int rc(int n) { return n<<1|1; }
-void addUtil(int n, int l, int r, EdgeTime& e) {
+void add_util(int n, int l, int r, EdgeTime& e) {
     int m = (l+r)>>1;
     if (l > e.te || r < e.ts)
         return;
     if (l < e.ts || r > e.te) {
-        addUtil(lc(n), l, m, e);
-        addUtil(rc(n), m+1, r, e);
+        add_util(lc(n), l, m, e);
+        add_util(rc(n), m+1, r, e);
     }
     else E[n].emplace_back(e.u, e.v);
 }
-void solveUtil(int n, int l, int r) {
+void solve_util(int n, int l, int r) {
     vector<int> log;
     int m = (l+r)>>1;
     for (pii& e : E[n])
         log.emplace_back(link(e.first, e.second));
     if (l != r) {
-        solveUtil(lc(n), l, m);
-        solveUtil(rc(n), m+1, r);
+        solve_util(lc(n), l, m);
+        solve_util(rc(n), m+1, r);
     }
     else cout << connected(que[l].first, que[l].second) << '\n';
-    for (auto it=log.rbegin(); it!=log.rend(); it++)
-        rollback(*it);
+    for (auto rit = log.rbegin(); rit != log.rend(); ++rit)
+        rollback(*rit);
 }
 
 int main() {
-    ios::sync_with_stdio(0);
-    cin.tie(0); cout.tie(0);
-    int N, M, Q;
-    int t, u, v;
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr); cout.tie(nullptr);
 
-    cin >> N >> M;
-    Q = 0;
+    int N, M; cin >> N >> M;
+    int Q = 0;
     while (M--) {
-        cin >> t >> u >> v;
+        int t, u, v; cin >> t >> u >> v;
         if (u > v)
             swap(u, v);
         if (t == 1)
@@ -113,19 +103,23 @@ int main() {
             Q++;
         }
     }
-    for (auto& kv : mp) {
-        auto& k = kv.first;
-        auto& v = kv.second;
+    for (const auto& [k, v] : mp)
         edti.emplace_back(k.first, k.second, v, Q-1);
-    }
 
-    E.resize(ceil_pow2(Q)<<1);
+    E.resize(2 * [](int n) {
+        if (n & (n-1)) {
+            for (int i = 1; i < 32; i <<= 1)
+                n |= (n>>i);
+            return n+1;
+        }
+        return n;
+    }(Q));
     for (auto& e : edti)
-        addUtil(1, 0, Q-1, e);
+        add_util(1, 0, Q-1, e);
 
     par.resize(N+1), rnk.resize(N+1, 0);
     iota(par.begin(), par.end(), 0);
-    solveUtil(1, 0, Q-1);
+    solve_util(1, 0, Q-1);
 
     return 0;
 }

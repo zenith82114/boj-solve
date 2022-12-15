@@ -7,13 +7,13 @@
 using namespace std;
 using ll = long long;
 
-class SplayTree {
-    struct Node {
+class splay_tree {
+    struct node {
         int val, sz, val_min, val_max;
         ll sum;
         bool rev;
-        Node *l, *r, *p;
-        Node(int v) :
+        node *l, *r, *p;
+        node(int v) :
             val(v), rev(false), l(nullptr), r(nullptr), p(nullptr) {}
         void update() {
             sz = 1;
@@ -40,9 +40,9 @@ class SplayTree {
         }
     } *root;
     int N;
-    void rotate(Node *x) {
-        Node *px = x->p;
-        Node *y;
+    void rotate(node *x) {
+        node *px = x->p;
+        node *y;
         if (x == px->l) {
             px->l = y = x->r;
             x->r = px;
@@ -61,8 +61,8 @@ class SplayTree {
         px->update();
         x->update();
     }
-    void splay(Node *x) {
-        Node *px, *gx;
+    void splay(node *x) {
+        node *px, *gx;
         while (x->p) {
             px = x->p;
             gx = px->p;
@@ -74,8 +74,8 @@ class SplayTree {
             rotate(x);
         }
     }
-    Node *find_index(int i) {
-        Node *x = root; x->lazy();
+    node *find_index(int i) {
+        node *x = root; x->lazy();
         while (true) {
             while (x->l && i < x->l->sz) {
                 x = x->l; x->lazy();
@@ -89,8 +89,8 @@ class SplayTree {
         splay(x);
         return x;
     }
-    Node *find_value(Node *x, int v) {
-        Node *y = nullptr;
+    node *find_value(node *x, int v) {
+        node *y = nullptr;
         x->lazy();
         if (v == x->val) {
             splay(x);
@@ -102,9 +102,9 @@ class SplayTree {
             y = find_value(x->r, v);
         return y;
     }
-    Node *find_interval(int i, int j) {
+    node *find_interval(int i, int j) {
         find_index(i-1);
-        Node *x = root;
+        node *x = root;
         root = x->r;
         root->p = nullptr;
         find_index(j-i+1);
@@ -113,7 +113,7 @@ class SplayTree {
         root = x;
         return root->r->l;
     }
-    void in_order_util(Node *x) {
+    void in_order_util(node *x) {
         if (!x) return;
         x->lazy();
         in_order_util(x->l);
@@ -124,10 +124,10 @@ class SplayTree {
 public:
     void init(int _N) {
         N = _N;
-        root = new Node(0);
-        Node *x = root;
+        root = new node(0);
+        node *x = root;
         for (int i=1; i<=N+1; ++i) {
-            x->r = new Node(i);
+            x->r = new node(i);
             x->r->p = x;
             x = x->r;
         }
@@ -143,11 +143,11 @@ public:
         cout << find_value(root, v)->l->sz << '\n';
     }
     void query_interval(int i, int j) {
-        Node *x = find_interval(i, j);
+        node *x = find_interval(i, j);
         cout << x->val_min << ' ' << x->val_max << ' ' << x->sum << '\n';
     }
     void flip_interval(int i, int j) {
-        Node *x = find_interval(i, j);
+        node *x = find_interval(i, j);
         x->rev = !x->rev;
     }
     void shift_interval(int i, int j, int k) {
@@ -167,14 +167,14 @@ public:
 } splayt;
 
 int main() {
-    ios::sync_with_stdio(0);
-    cin.tie(0), cout.tie(0);
-    int N, Q, q, l, r, x;
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr), cout.tie(nullptr);
 
-    cin >> N >> Q;
+    int N, Q; cin >> N >> Q;
+    int l, r, x;
     splayt.init(N);
     while (Q--) {
-        cin >> q;
+        int q; cin >> q;
         switch (q) {
             case 1:
                 cin >> l >> r;

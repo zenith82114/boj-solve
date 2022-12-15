@@ -7,7 +7,7 @@
 using namespace std;
 using ll = long long;
 
-class SegTree {
+class seg_tree {
     struct lazy_struct {
         bool flag = false;
         int m = 0, a = 0;
@@ -18,18 +18,10 @@ class SegTree {
     vector<int> tree;
     vector<lazy_struct> lazy;
 
-    constexpr int ceil_pow2(int n) {
-        if (n & (n-1)) {
-            for (int i = 1; i < 32; i <<= 1)
-                n |= (n >> i);
-            return n+1;
-        }
-        return n;
-    }
     int lc(int n) { return n<<1; }
     int rc(int n) { return n<<1 | 1; }
     int add_mod(int a, int b) { return (a + b) % MOD; }
-    int mul_mod(int a, int b) { return (int)(((ll)a * b) % MOD); }
+    int mul_mod(int a, int b) { return (int)((1ll * a * b) % MOD); }
     void lazy_prop(int n, int m, int a) {
         auto& lz = lazy[n];
         if (lz.flag) {
@@ -101,9 +93,11 @@ class SegTree {
         return tree[n];
     }
 public:
-    SegTree(vector<int>& A) {
+    seg_tree(vector<int>& A) {
         N = A.size()-1;
-        tree.resize(ceil_pow2(N)<<1);
+        int sz = 1;
+        while (sz < N) sz <<= 1;
+        tree.resize(sz<<1);
         lazy.resize(tree.size());
         init_util(1, 1, N, A);
     }
@@ -116,18 +110,18 @@ public:
 };
 
 int main() {
-    ios::sync_with_stdio(0);
-    cin.tie(0); cout.tie(0);
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr); cout.tie(nullptr);
 
     int N; cin >> N;
     vector<int> A(N+1);
-    for (int i = 1; i <= N; i++)
+    for (int i = 1; i <= N; ++i)
         cin >> A[i];
-    SegTree segt(A);
+    seg_tree segt(A);
 
     int M; cin >> M;
-    int q, i, j, v;
     while (M--) {
+        int q, i, j, v;
         cin >> q >> i >> j;
         switch (q) {
             case 1:

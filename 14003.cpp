@@ -9,7 +9,8 @@
 using namespace std;
 
 int main() {
-    ios::sync_with_stdio(0); cin.tie(0);
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr); cout.tie(nullptr);
 
     int N; cin >> N;
     vector<int> arr(N), last, pos(N);

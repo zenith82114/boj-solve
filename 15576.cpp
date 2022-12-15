@@ -18,7 +18,7 @@ uint bitrev32(uint x) {
     return x>>(32-lgD);
 }
 
-void FFT(vector<cpx>& P, const bool inv) {
+void fft(vector<cpx>& P, const bool inv) {
     double theta;
     cpx a, b, z, w;
     for (uint i = 0, j; i < D; i++) {
@@ -26,12 +26,12 @@ void FFT(vector<cpx>& P, const bool inv) {
         if (i < j)
             swap(P[i], P[j]);
     }
-    for (uint n = 1; n < D; n<<=1) {
+    for (uint n = 1; n < D; n <<= 1) {
         theta = inv ? -PI/(double)n : PI/(double)n;
         for (uint m = 0; m < D; m += n<<1) {
             z = 1.0;
             w = polar(1.0, theta);
-            for (uint i = 0, j = n; i < n; i++, j++) {
+            for (uint i = 0, j = n; i < n; ++i, ++j) {
                 a = P[m+i];
                 b = P[m+j] * z;
                 P[m+i] = a+b;
@@ -47,18 +47,16 @@ void FFT(vector<cpx>& P, const bool inv) {
 }
 
 int main() {
-    ios::sync_with_stdio(0);
-    cin.tie(0); cout.tie(0);
-    vector<cpx> PA, PB;
-    string A, B, X;
-    uint d;
-    int v, c;
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr); cout.tie(nullptr);
 
-    cin >> A >> B;
+    string A, B; cin >> A >> B;
     if (A == "0" || B == "0") {
         cout << "0\n";
         return 0;
     }
+
+    vector<cpx> PA, PB;
     for (auto a = A.rbegin(); a != A.rend(); a++)
         PA.push_back(*a - '0');
     PA.resize(D);
@@ -66,17 +64,17 @@ int main() {
         PB.push_back(*b - '0');
     PB.resize(D);
 
-    FFT(PA, false);
-    FFT(PB, false);
-    for (uint i = 0; i < D; i++)
+    fft(PA, false);
+    fft(PB, false);
+    for (uint i = 0; i < D; ++i)
         PA[i] *= PB[i];
-    FFT(PA, true);
+    fft(PA, true);
 
-    d = A.length() + B.length();
-    X.resize(d);
-    c = 0;
-    for (uint i = 0; i < d; i++) {
-        v = (int)round(PA[i].real());
+    uint d = A.length() + B.length();
+    string X; X.resize(d);
+    int c = 0;
+    for (uint i = 0; i < d; ++i) {
+        int v = (int)round(PA[i].real());
         v += c;
         X[d-1-i] = '0' + (v%10);
         c = v/10;

@@ -6,33 +6,30 @@
 #include<bits/stdc++.h>
 using namespace std;
 
-array<int, 4'000'001> radius;
-
 int main() {
-    ios::sync_with_stdio(0);
-    cin.tie(0); cout.tie(0);
-    string S, T;
-    int N, i, lj, rj, r, s;
-    ulong cnt;
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr); cout.tie(nullptr);
 
-    cin >> S;
-    T = ".";
+    string S; cin >> S;
+    string T(".");
     for (auto& c : S) {
         T.push_back(c);
         T.push_back('.');
     }
 
-    N = T.length();
-    i = r = 0;
-    cnt = 0;
+    array<int, 4'000'001> radius;
+    int N = T.length();
+    int i = 0, r = 0;
+    ulong cnt = 0ul;
     while (i < N) {
-        while (i-r-1>=0 && i+r+1<N && T[i-r-1]==T[i+r+1])
+        while (i-r-1 >= 0 && i+r+1 < N && T[i-r-1] == T[i+r+1])
             r++;
         radius[i] = r;
         cnt += (radius[i]+1)>>1;
 
-        for (rj = i+1; rj <= i+r; rj++) {
-            lj = (i<<1) - rj;
+        int rj, s;
+        for (rj = i+1; rj <= i+r; ++rj) {
+            int lj = (i<<1) - rj;
             s = i+r - rj;
             if (radius[lj] != s) {
                 radius[rj] = min(radius[lj], s);

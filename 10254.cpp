@@ -31,7 +31,7 @@ int ccw(const vec2& o, const vec2& p, const vec2& q) {
 
 // increasing order in angle, then in radius
 vec2 orig;
-bool polarSort(const vec2& p, const vec2& q) {
+bool polar_sort(const vec2& p, const vec2& q) {
     int k = ccw(orig,p,q);
     return k != 0 ? k > 0 : dot(q-p, orig-p) < 0;
 }
@@ -41,33 +41,32 @@ inline double dist(const vec2& p, const vec2& q) {
 }
 
 int main() {
-    cin.tie(0)->sync_with_stdio(0);
-    cout.tie(0)->sync_with_stdio(0);
-    vector<vec2> points, hull;
-    double d, _d;
-    int TC, N, M, i, j, j0;
-    int P = 0, Q = 0;
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr); cout.tie(nullptr);
 
-    cin >> TC;
+    int TC; cin >> TC;
     while (TC--) {
-        cin >> N;
-        points.resize(N);
+        int N; cin >> N;
+        vector<vec2> points(N);
 
         // sort points
-        M = 0;
-        for (int n = 0; n < N; n++) {
-            cin >> points[n].x >> points[n].y;
-            if (points[n] < points[M])
-                M = n;
+        int argmin = 0;
+        for (int i = 0; i < N; ++i) {
+            vec2& p = points[i];
+            cin >> p.x >> p.y;
+            if (p < points[argmin]) argmin = i;
         }
-        swap(points.front(), points[M]);
-        orig = points.front();
-        sort(++points.begin(), points.end(), polarSort);
+        swap(points[0], points[argmin]);
+        vec2& orig = points[0];
+        sort(++points.begin(), points.end(), [&orig](const vec2& p, const vec2& q) {
+            int k = ccw(orig, p, q);
+            return k != 0 ? k > 0 : dot(q - p, orig - p) < 0;
+        });
 
         // Graham scan
-        M = 0;
-        hull.clear();
-        for (auto &p : points) {
+        int M = 0;
+        vector<vec2> hull;
+        for (const auto &p : points) {
             while (M > 1 && ccw(hull[M-2], hull[M-1], p) <= 0) {
                 hull.pop_back();
                 M--;
@@ -77,14 +76,15 @@ int main() {
         }
 
         // Rotating calipers
-        d = 0.;
+        double d = 0.;
+        int P = 0, Q = 0;
         if (M > 3) {
-            i = 0, j = 1;
+            int i = 0, j = 1;
             while (cross(hull[1] - hull[0], hull[(j+1)%M] - hull[j]) > 0)
                 j++;
-            j0 = j;
+            int j0 = j;
             while (i < j0 && j < M) {
-                _d = dist(hull[i], hull[j]);
+                double _d = dist(hull[i], hull[j]);
                 if (d < _d) {
                     d = _d; P = i; Q = j;
                 }
@@ -95,9 +95,9 @@ int main() {
             }
         }
         else {
-            for (i = 0; i < M; i++) {
-                j = (i+1)%M;
-                _d = dist(hull[i], hull[j]);
+            for (int i = 0; i < M; ++i) {
+                int j = (i+1)%M;
+                double _d = dist(hull[i], hull[j]);
                 if (d < _d) {
                     d = _d; P = i; Q = j;
                 }

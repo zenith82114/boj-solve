@@ -10,42 +10,36 @@ constexpr int MAXN = 100000;
 struct Edge { int u, v, w; } edges[MAXN];
 vector<int> adj[MAXN+1];
 int par[MAXN+1], sz[MAXN+1],
-    chNo[MAXN+1], chDep[MAXN+1], chIdx[MAXN+1], chLen[MAXN+1],
-    stIdx[MAXN+1];
+    ch_id[MAXN+1], ch_dep[MAXN+1], ch_pos[MAXN+1],
+    st_idx[MAXN+1];
 
-class SegTree {
+class seg_tree {
     int N;
     vector<int> A;
-    int ceilPow2(int n) {
-        if (n & (n-1)) {
-            for (int i=1; i<32; i<<=1)
-                n |= (n>>i);
-            return n+1;
-        }
-        return n;
-    }
     int lc(int n) { return n<<1; }
     int rc(int n) { return n<<1|1; }
-    int queryUtil(int n, int l, int r, int i, int j) {
+    int query_util(int n, int l, int r, int i, int j) {
         int m = (l+r)>>1;
         if (l > j || r < i)
             return 0;
         if (l < i || r > j)
             return max(
-                queryUtil(lc(n), l, m, i, j),
-                queryUtil(rc(n), m+1, r, i, j)
+                query_util(lc(n), l, m, i, j),
+                query_util(rc(n), m+1, r, i, j)
             );
         return A[n];
     }
 public:
     void init(int _N) {
         N = _N;
-        A.assign(ceilPow2(N)<<1, 0);
+        int sz = 1;
+        while (sz < N) sz <<= 1;
+        A.assign(sz<<1, 0);
     }
     void update(int i, int w) {
-        int n=1, l=0, r=N-1, m;
+        int n = 1, l = 0, r = N-1;
         while (l != r) {
-            m = (l+r)>>1;
+            int m = (l+r)>>1;
             if (m < i)
                 n = rc(n), l = m+1;
             else
@@ -53,7 +47,7 @@ public:
         }
         A[n] = w;
         while (n > 1) {
-            m = max(A[n], A[n^1]);
+            int m = max(A[n], A[n^1]);
             if (A[n>>1] != m)
                 A[n>>1] = m, n >>= 1;
             else break;
@@ -62,83 +56,81 @@ public:
     int query(int i, int j) {
         if (i > j)
             return 0;
-        return queryUtil(1, 0, N-1, i, j);
+        return query_util(1, 0, N-1, i, j);
     }
 } segt;
 
 int dfs(int pu, int u) {
     par[u] = pu;
     sz[u] = 1;
-    for (int& v : adj[u])
-        if (v != pu)
-            sz[u] += dfs(u, v);
+    for (int& v : adj[u]) if (v != pu)
+        sz[u] += dfs(u, v);
     return sz[u];
 }
 
-void hld(int u, int cn, int cd, int& ti) {
-    chNo[u] = cn;
-    chDep[u] = cd;
-    chIdx[u] = chLen[cn]++;
-    stIdx[u] = ti++;
+void hld(int u, int ci, int cd, int cp, int& ti) {
+    ch_id[u] = ci;
+    ch_dep[u] = cd;
+    ch_pos[u] = cp;
+    st_idx[u] = ti++;
 
     int hv = 0;
     for (int& v : adj[u])
         if (v != par[u] && (!hv || sz[v] > sz[hv]))
             hv = v;
     if (hv)
-        hld(hv, cn, cd, ti);
-    for (int& v : adj[u])
-        if (v != par[u] && v != hv)
-            hld(v, v, cd+1, ti);
+        hld(hv, ci, cd, cp+1, ti);
+    for (int& v : adj[u]) if (v != par[u] && v != hv)
+        hld(v, v, cd+1, 0, ti);
 }
 
 int main() {
-    ios::sync_with_stdio(0);
-    cin.tie(0); cout.tie(0);
-    int N, M, i, u, v, w, q, r;
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr); cout.tie(nullptr);
 
-    cin >> N;
-    for (i=1; i<N; i++) {
-        cin >> u >> v >> w;
+    int N; cin >> N;
+    for (int i = 1; i < N; ++i) {
+        int u, v, w; cin >> u >> v >> w;
         adj[u].emplace_back(v);
         adj[v].emplace_back(u);
         edges[i] = { u, v, w };
     }
 
     dfs(0, 1);
-    i = 0;
-    hld(1, 1, 0, i);
+    int id = 0;
+    hld(1, 1, 0, 0, id);
+
     segt.init(N);
-    for (i=1; i<N; i++) {
+    for (int i = 1; i < N; ++i) {
         auto& e = edges[i];
-        if (chNo[e.u] != chNo[e.v]) {
-            if (chDep[e.u] > chDep[e.v])
+        if (ch_id[e.u] != ch_id[e.v]) {
+            if (ch_dep[e.u] > ch_dep[e.v])
                 swap(e.u, e.v);
         }
-        else if (chIdx[e.u] > chIdx[e.v])
+        else if (ch_pos[e.u] > ch_pos[e.v])
             swap(e.u, e.v);
-        segt.update(stIdx[e.v], e.w);
+        segt.update(st_idx[e.v], e.w);
     }
 
-    cin >> M;
+    int M; cin >> M;
     while (M--) {
-        cin >> q;
+        int q; cin >> q;
         if (q&1) {
-            cin >> i >> w;
-            segt.update(stIdx[edges[i].v], w);
+            int i, w; cin >> i >> w;
+            segt.update(st_idx[edges[i].v], w);
         }
         else {
-            cin >> u >> v;
-            r = 0;
-            while (chNo[u] != chNo[v]) {
-                if (chDep[u] > chDep[v])
+            int u, v; cin >> u >> v;
+            int r = 0;
+            while (ch_id[u] != ch_id[v]) {
+                if (ch_dep[u] > ch_dep[v])
                     swap(u, v);
-                r = max(r, segt.query(stIdx[chNo[v]], stIdx[v]));
-                v = par[chNo[v]];
+                r = max(r, segt.query(st_idx[ch_id[v]], st_idx[v]));
+                v = par[ch_id[v]];
             }
-            if (chIdx[u] > chIdx[v])
+            if (ch_pos[u] > ch_pos[v])
                 swap(u, v);
-            r = max(r, segt.query(stIdx[u]+1, stIdx[v]));
+            r = max(r, segt.query(st_idx[u]+1, st_idx[v]));
             cout << r << '\n';
         }
     }

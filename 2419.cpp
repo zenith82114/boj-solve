@@ -7,7 +7,7 @@
 using namespace std;
 const int INF = INT_MAX>>1;
 
-int N, M, res;
+int N;
 vector<int> X;
 int memo[301][301][2];
 
@@ -32,18 +32,17 @@ int dp(int l, int r, int t, int n) {
 }
 
 int main() {
-    ios::sync_with_stdio(0);
-    cin.tie(0); cout.tie(0);
-    int s, res;
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr); cout.tie(nullptr);
 
-    cin >> N >> M;
+    int M; cin >> N >> M;
     X.resize(N);
     for (int& x : X) cin >> x;
     X.emplace_back(0);
     sort(X.begin(), X.end());
-    s = distance(X.begin(), lower_bound(X.begin(), X.end(), 0));
 
-    res = 0;
+    int s = distance(X.begin(), lower_bound(X.begin(), X.end(), 0));
+    int res = 0;
     for (int n = 0; n <= N; ++n) {
         memset(memo, -1, sizeof memo);
         res = max(res, n*M - dp(s, s, 0, n));

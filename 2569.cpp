@@ -36,9 +36,7 @@ int main() {
     }
 
     const int& a0 = cycles[0].first;
-    for (const auto& c : cycles) {
-        const int& a = c.first;
-        const int& k = c.second;
+    for (const auto& [a, k] : cycles) {
         ans += min(a * (k-2), a + a0 * (k+1));
     }
     cout << ans << endl;

@@ -63,8 +63,7 @@ int main() {
 
     int w = pow_mod(3, M, MOD);
     int ans = 0;
-    for (const auto& e : E) {
-        int x, y; tie(x, y) = e;
+    for (const auto& [x, y] : E) {
         w = mul_mod(w, inv_3, MOD);
 
         if (uf.query(x, y)) {

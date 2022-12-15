@@ -1,6 +1,6 @@
 /*
  * Q11378 - Advanced bipartite matching as maximum flow
- * Date: 2022.1.26, 2022.7.7(revised)
+ * Date: 2022.1.26
  */
 
 #include<iostream>
@@ -46,26 +46,25 @@ inline void add_edge(int from, int to, int c) {
 }
 
 int main() {
-    ios::sync_with_stdio(0);
-    cin.tie(0), cout.tie(0);
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr); cout.tie(nullptr);
 
     int N, M, K; cin >> N >> M >> K;
     const int S = 0;
     const int B = 1;
     const int T = N+M+2;
-    int l, m;
 
     add_edge(S, B, K);
-    for (int n = 1; n <= N; n++) {
+    for (int n = 1; n <= N; ++n) {
         add_edge(S, person(n), 1);
         add_edge(B, person(n), K);
-        cin >> l;
+        int l; cin >> l;
         while (l--) {
-            cin >> m;
+            int m; cin >> m;
             add_edge(person(n), work(m), 1);
         }
     }
-    for (int m = 1; m <= M; m++)
+    for (int m = 1; m <= M; ++m)
         add_edge(work(m), T, 1);
 
     int C = 0;

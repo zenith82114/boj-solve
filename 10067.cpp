@@ -15,33 +15,30 @@ struct Line {
 inline ll cx(const Line& a, const Line& b) {
     return (b.y0 - a.y0)/(a.m - b.m);
 }
-deque<Line> hl;
-int sz;
-vector<ll> S, dp0, dp1;
-vector<vector<int>> tr;
 
 int main() {
-    ios::sync_with_stdio(0);
-    cin.tie(0); cout.tie(0);
-    vector<int> res;
-    int N, K;
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr); cout.tie(nullptr);
 
-    cin >> N >> K;
-    S.resize(N);
+    int N, K; cin >> N >> K;
+
+    vector<ll> S(N);
     cin >> S[0];
-    for (int n=1; n<N; n++) {
+    for (int n = 1; n < N; ++n) {
         cin >> S[n];
         S[n] += S[n-1];
     }
-    dp0.resize(N);
-    dp1.assign(N, 0);
-    tr.resize(K, vector<int>(N));
 
-    for (int k=0; k<K; k++) {
-        sz = 0, hl.clear();
+    vector<ll> dp0(N), dp1(N);
+    vector<vector<int>> tr(K, vector<int>(N));
+
+    for (int k = 0; k < K; ++k) {
+        int sz = 0;
+        deque<Line> hl;
         swap(dp0, dp1);
-        for (int n=0; n+1<N; n++) {
-            Line line(n, dp0[n] - S[n]*S[n], S[n]);
+
+        for (int n = 0; n+1 < N; ++n) {
+            Line line(n, dp0[n] - S[n] * S[n], S[n]);
 
             if (sz && hl[sz-1].m == line.m && hl[sz-1].y0 <= line.y0)
                 sz--, hl.pop_back();
@@ -51,16 +48,17 @@ int main() {
 
             while (sz>1 && cx(hl[1], hl[0]) < S[n+1])
                 sz--, hl.pop_front();
-            dp1[n+1] = hl[0].y0 + hl[0].m*S[n+1];
+            dp1[n+1] = hl[0].y0 + hl[0].m * S[n+1];
             tr[k][n+1] = hl[0].id;
         }
     }
-
     cout << dp1[N-1] << '\n';
-    for (int k=K-1, n=N-1; ~k; n=tr[k--][n])
-        res.push_back(tr[k][n]+1);
+
+    vector<int> res;
+    for (int k = K-1, n = N-1; ~k; n = tr[k--][n])
+        res.push_back(tr[k][n] +1);
     cout << res.back();
-    for (auto i=res.size()-2; ~i; i--) {
+    for (int i = (int)res.size() -2; ~i; --i) {
         if (res[i] <= res[i+1])
             res[i] = res[i+1]+1;
         cout << ' ' << res[i];

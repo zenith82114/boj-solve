@@ -6,56 +6,51 @@
 #include<bits/stdc++.h>
 using namespace std;
 
-vector<int> A;
-struct Query { int id, l, r; };
-vector<Query> Q;
-vector<int> R;
 array<int, 1'000'001> freq;
-vector<int> freqGroup;
-int maxFreq;
+vector<int> freq_group;
+int max_freq;
 
 inline void add(int x) {
     int f = freq[x]++;
-    freqGroup[f]--;
-    freqGroup[f+1]++;
-    if (maxFreq == f)
-        maxFreq++;
+    freq_group[f]--;
+    freq_group[f+1]++;
+    if (max_freq == f)
+        max_freq++;
 }
 inline void remove(int x) {
     int f = freq[x]--;
-    freqGroup[f]--;
-    freqGroup[f-1]++;
-    if (!freqGroup[maxFreq])
-        maxFreq--;
+    freq_group[f]--;
+    freq_group[f-1]++;
+    if (!freq_group[max_freq])
+        max_freq--;
 }
 
 int main() {
-    ios::sync_with_stdio(0);
-    cin.tie(0); cout.tie(0);
-    int N, M;
-    int blk, l, r;
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr); cout.tie(nullptr);
 
-    cin >> N;
-    A.resize(N+1);
-    for (int n=1; n<=N; n++)
-        cin >> A[n];
-    cin >> M;
-    Q.resize(M);
-    for (int m=0; m<M; m++) {
+    int N; cin >> N;
+    vector<int> A(N+1);
+    for (int n = 1; n <= N; ++n) cin >> A[n];
+
+    int M; cin >> M;
+    struct query { int id, l, r; };
+    vector<query> Q(M);
+    for (int m = 0; m < M; ++m) {
         Q[m].id = m;
         cin >> Q[m].l >> Q[m].r;
     }
-    blk = (int)sqrt(N+1);
-    sort(Q.begin(), Q.end(), [&](const Query& p, const Query& q){
+    int blk = (int)sqrt(N+1);
+    sort(Q.begin(), Q.end(), [&blk](const query& p, const query& q){
         return p.r/blk != q.r/blk ? p.r/blk < q.r/blk : p.l < q.l;
     });
 
     freq.fill(0);
-    maxFreq = 0;
-    freqGroup.assign(N+1, 0);
-    R.resize(M);
-    l = 1, r = 0;
-    for (auto& q : Q) {
+    max_freq = 0;
+    freq_group.resize(N+1, 0);
+    vector<int> R(M);
+    int l = 1, r = 0;
+    for (const auto& q : Q) {
         while (r < q.r)
             add(A[++r]);
         while (r > q.r)
@@ -64,10 +59,10 @@ int main() {
             remove(A[l++]);
         while (l > q.l)
             add(A[--l]);
-        R[q.id] = maxFreq;
+        R[q.id] = max_freq;
     }
 
-    for (int& res : R)
+    for (const int& res : R)
         cout << res << '\n';
     return 0;
 }

@@ -49,14 +49,12 @@ array<bool, 302> visited;
 array<int, 302> pred;
 
 bool bfs(const int S, const int T) {
-    queue<int> q;
-    int u, v;
-    q.push(S);
+    queue<int> q; q.push(S);
     visited.fill(false);
     visited[S] = true;
     while (!q.empty()) {
-        u = q.front(); q.pop();
-        for (v = 0; v <= T; v++) {
+        int u = q.front(); q.pop();
+        for (int v = 0; v <= T; ++v) {
             if (!visited[v] && G[u][v] > 0) {
                 if (v == T) {
                     pred[T] = u;
@@ -72,29 +70,24 @@ bool bfs(const int S, const int T) {
 }
 
 int main() {
-    cin.tie(0)->sync_with_stdio(0);
-    vector<vec2> corners, holes, mice;
-    bool flag;
-    int N, K, H, M, n, h, m;
-    int S, T, C;
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr); cout.tie(nullptr);
 
-    cin >> N >> K >> H >> M;
-    corners.resize(N);
-    holes.resize(H);
-    mice.resize(M);
-    for (n = 0; n < N; n++)
+    int N, K, H, M; cin >> N >> K >> H >> M;
+    vector<vec2> corners(N), holes(H), mice(M);
+    for (int n = 0; n < N; ++n)
         cin >> corners[n].x >> corners[n].y;
-    for (h = 0; h < H; h++)
+    for (int h = 0; h < H; ++h)
         cin >> holes[h].x >> holes[h].y;
-    for (m = 0; m < M; m++)
+    for (int m = 0; m < M; ++m)
         cin >> mice[m].x >> mice[m].y;
 
-    S = M+H;
-    T = S+1;
-    for (m = 0; m < M; m++) {
-        for (h = 0; h < H; h++) {
-            flag = true;
-            for (n = 0; n < N; n++) {
+    int S = M+H;
+    int T = S+1;
+    for (int m = 0; m < M; ++m) {
+        for (int h = 0; h < H; ++h) {
+            bool flag = true;
+            for (int n = 0; n < N; ++n) {
                 if (!contains(corners[n], corners[(n+1)%N], holes[h]) &&
                     intersects(corners[n], corners[(n+1)%N], mice[m], holes[h])) {
                     flag = false;
@@ -105,12 +98,12 @@ int main() {
                 G[m][M+h] = 1;
         }
     }
-    for (m = 0; m < M; m++)
+    for (int m = 0; m < M; ++m)
         G[S][m] = 1;
-    for (h = 0; h < H; h++)
+    for (int h = 0; h < H; ++h)
         G[M+h][T] = K;
 
-    C = 0;
+    int C = 0;
     while (bfs(S, T)) {
         C++;
         for (int v = T; v != S; v = pred[v]) {

@@ -13,7 +13,7 @@ inline int get_color_cnt(int i, int j, int c) {
          - lower_bound(group.begin(), group.end(), i);
 }
 
-class SegTree {
+class seg_tree {
     int N;
     vector<int> tree;
     int lc(int n) { return n<<1; }
@@ -44,7 +44,7 @@ class SegTree {
             ans.emplace_back(tree[n]);
     }
 public:
-    SegTree(vector<int>& data) {
+    seg_tree(vector<int>& data) {
         N = data.size()-1;
         int sz = N;
         if (sz & (sz-1)) {
@@ -61,8 +61,8 @@ public:
 };
 
 int main() {
-    ios::sync_with_stdio(0);
-    cin.tie(0); cout.tie(0);
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr); cout.tie(nullptr);
 
     int N, C; cin >> N >> C;
     vector<int> data(N+1);
@@ -75,7 +75,7 @@ int main() {
         sort(group.begin(), group.end());
 
     int M; cin >> M;
-    SegTree segt(data);
+    seg_tree segt(data);
     vector<int> colors;
     while (M--) {
         int i, j; cin >> i >> j;

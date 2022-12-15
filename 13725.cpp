@@ -64,7 +64,7 @@ struct mint {
 };
 
 using poly = vector<mint>;
-array<mint, PRIM_ROOT_IDX + 1> roots;
+array<mint, PRIM_ROOT_IDX + 1> roots, roots_inv;
 
 inline int ceil_pow2(int n) {
     if (n & (n-1)) {
@@ -96,7 +96,7 @@ void ntt(poly& A, const bool inv) {
         if (i < j) swap(A[i], A[j]);
     }
     for (int n = 2, rn = 1; n <= N; n <<= 1, ++rn) {
-        mint w(inv ? roots[rn].inv() : roots[rn]);
+        mint w(inv ? roots_inv[rn] : roots[rn]);
         for (int m = 0; m < N; m += n) {
             mint z(1);
             for (int i = 0, j = n>>1; j < n; ++i, ++j) {
@@ -183,13 +183,15 @@ poly kitamasa(poly C, int64_t n) {
 }
 
 int main() {
-    ios_base::sync_with_stdio(0);
-    cin.tie(0); cout.tie(0);
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr); cout.tie(nullptr);
 
     // preprocess roots for NTT
     roots[PRIM_ROOT_IDX] = mint(PRIM_ROOT);
     for (int i = PRIM_ROOT_IDX; i; --i)
         roots[i-1] = roots[i] * roots[i];
+    for (int i = 1; i <= PRIM_ROOT_IDX; ++i)
+        roots_inv[i] = roots[i].inv();
 
     int k; cin >> k;
     int64_t N; cin >> N;

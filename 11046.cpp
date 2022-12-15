@@ -6,30 +6,29 @@
 #include<bits/stdc++.h>
 using namespace std;
 
-array<int, 2'000'001> value, radius;
-
 int main() {
-    ios::sync_with_stdio(0);
-    cin.tie(0); cout.tie(0);
-    int N, i, lj, rj, r, s;
-    int M, S, E;
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr); cout.tie(nullptr);
 
-    cin >> N;
+    int N; cin >> N;
     N = (N<<1)|1;
-    value[0] = 0;
-    for (i = 1; i < N; i += 2) {
+
+    vector<int> value(N);
+    for (int i = 1; i < N; i += 2) {
         cin >> value[i];
         value[i+1] = 0;
     }
 
-    i = r = 0;
+    vector<int> radius(N);
+    int i = 0, r = 0;
     while (i < N) {
-        while (i-r-1>=0 && i+r+1<N && value[i-r-1]==value[i+r+1])
+        while (i-r-1 >= 0 && i+r+1 < N && value[i-r-1] == value[i+r+1])
             r++;
         radius[i] = r;
 
-        for (rj = i+1; rj <= i+r; rj++) {
-            lj = (i<<1) - rj;
+        int rj, s;
+        for (rj = i+1; rj <= i+r; ++rj) {
+            int lj = (i<<1) - rj;
             s = i+r - rj;
             if (radius[lj] != s)
                 radius[rj] = min(radius[lj], s);
@@ -39,9 +38,9 @@ int main() {
         i = rj;
     }
 
-    cin >> M;
+    int M; cin >> M;
     while (M--) {
-        cin >> S >> E;
+        int S, E; cin >> S >> E;
         cout << (int)(radius[S+E-1] >= E-S+1) << '\n';
     }
 

@@ -8,7 +8,7 @@ using namespace std;
 
 string N, M;
 int K, lN;
-bool memo[20][1<<10][2]{};
+bool memo[20][1<<10][2];
 
 bool dfs(int i, int k, int mask, bool tight) {
     if (i == lN)
@@ -17,7 +17,7 @@ bool dfs(int i, int k, int mask, bool tight) {
         return false;
     bool flag = false;
     for (char d = tight ? N[i] : '0'; d <= '9'; ++d) {
-        int md = 1<<(d-'0');
+        int md = 1 << (d - '0');
         if (!(mask & md)) {
             if (k < K) {
                 flag = true;
@@ -27,7 +27,7 @@ bool dfs(int i, int k, int mask, bool tight) {
             else continue;
         }
         M[i] = d;
-        if (dfs(i+1, k, mask, tight && d == N[i]))
+        if (dfs(i +1, k, mask, tight && d == N[i]))
             return true;
         if (flag) {
             flag = false;
@@ -41,18 +41,18 @@ bool dfs(int i, int k, int mask, bool tight) {
 }
 
 int main() {
-    ios::sync_with_stdio(0);
-    cin.tie(0); cout.tie(0);
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr); cout.tie(nullptr);
 
     cin >> N >> K;
-    lN = (int)N.size();
+    lN = N.size();
     M.resize(lN, '0');
     if (lN < K || !dfs(0, 0, 0, true)) {
-        int lM = max(lN+1, K);
+        int lM = max(lN +1, K);
         M.resize(lM, '0');
         M[0] = '1';
         for (int k = 2; k < K; ++k)
-            M[lM-K+k] = k+'0';
+            M[lM - K + k] = k + '0';
     }
     cout << M << '\n';
     return 0;

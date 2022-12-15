@@ -1,6 +1,6 @@
 /*
  * Q2927 - HLD + Union-find + BIT
- * Date: 2022.7.8, 2022.8.30(revised)
+ * Date: 2022.7.8
  */
 
 #include<bits/stdc++.h>
@@ -69,9 +69,9 @@ public:
     BIT(vector<int>& data) {
         sz = data.size();
         tree.resize(sz);
-        for (int i = 1; i < sz; i++)
+        for (int i = 1; i < sz; ++i)
             tree[bit_idx[i]] = data[i];
-        for (int i = 1; i < sz; i++) {
+        for (int i = 1; i < sz; ++i) {
             int j = i + lsb(i);
             if (j < sz)
                 tree[j] += tree[i];
@@ -93,26 +93,25 @@ public:
     }
 };
 
-struct Query { int op, a, b; };
-vector<Query> queries;
 
 int main() {
-    ios::sync_with_stdio(0);
-    cin.tie(0); cout.tie(0);
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr); cout.tie(nullptr);
 
     int N; cin >> N;
     vector<int> data(N+1);
-    for (int n = 1; n <= N; n++)
+    for (int n = 1; n <= N; ++n)
         cin >> data[n];
 
     adj.resize(N+1);
     uf_arr.resize(N+1, -1);
 
     int M; cin >> M;
-    queries.resize(M);
-    string str;
+    struct query { int op, a, b; };
+    vector<query> queries(M);
 
     for (auto& q : queries) {
+        string str;
         cin >> str >> q.a >> q.b;
         switch (str[0]) {
             case 'b':
@@ -138,16 +137,16 @@ int main() {
     ch_len .resize(N+1);
     bit_idx.resize(N+1);
 
-    for (int u = 1; u <= N; u++) if (!hld_sz[u])
+    for (int u = 1; u <= N; ++u) if (!hld_sz[u])
         hld_dfs1(0, u);
     int bi = 1;
-    for (int u = 1; u <= N; u++) if (!ch_no[u])
+    for (int u = 1; u <= N; ++u) if (!ch_no[u])
         hld_dfs2(u, u, 0, bi);
 
     fill(uf_arr.begin(), uf_arr.end(), -1);
     BIT bit(data);
 
-    for (auto& q : queries) {
+    for (const auto& q : queries) {
         int a = q.a, b = q.b;
         switch (q.op) {
             case 0:

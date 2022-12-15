@@ -10,7 +10,7 @@ int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr); cout.tie(nullptr);
 
-    vector<int> cnt(1'024);
+    array<int, 1'024> cnt; cnt.fill(0);
     int N; cin >> N;
     for (int n = 0; n < N; ++n) {
         int a; cin >> a;

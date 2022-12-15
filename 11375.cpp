@@ -13,12 +13,11 @@ array<int, 1001> taken;
 array<bool, 1001> visited;
 
 bool match(int n) {
-    int t;
     visited[n] = true;
     for (int& m : G[n]) {
-        t = taken[m];
+        int& t = taken[m];
         if (t == 0 || (!visited[t] && match(t))) {
-            taken[m] = n;
+            t = n;
             return true;
         }
     }
@@ -26,21 +25,21 @@ bool match(int n) {
 }
 
 int main() {
-    cin.tie(0)->sync_with_stdio(0);
-    int N, M, n, m, k, C;
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr); cout.tie(nullptr);
 
-    cin >> N >> M;
-    for (n = 1; n <= N; n++) {
-        cin >> k;
+    int N, M; cin >> N >> M;
+    for (int n = 1; n <= N; ++n) {
+        int k; cin >> k;
         while (k--) {
-            cin >> m;
+            int m; cin >> m;
             G[n].push_back(m);
         }
     }
 
     taken.fill(0);
-    C = 0;
-    for (n = 1; n <= N; n++) {
+    int C = 0;
+    for (int n = 1; n <= N; ++n) {
         visited.fill(false);
         if (match(n)) C++;
     }

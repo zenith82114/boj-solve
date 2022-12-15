@@ -3,89 +3,72 @@
  * Date: 2021.8.2
  */
 
-#include<iostream>
-#include<algorithm>
-#include<numeric>
-#include<queue>
-#include<tuple>
+#include<bits/stdc++.h>
 using namespace std;
-constexpr int MAX = 100000;
 
-struct Point {
-    int id, pos[3];
-}points[MAX];
-bool(*PointCmp[3])(const Point&, const Point&) = {
-    [](const Point& p1, const Point& p2) {
-        return p1.pos[0] < p2.pos[0]; },
-    [](const Point& p1, const Point& p2) {
-        return p1.pos[1] < p2.pos[1]; },
-    [](const Point& p1, const Point& p2) {
-        return p1.pos[2] < p2.pos[2]; }
-};
+struct Point { int id, pos[3]; };
 
-struct PQitem {
-    int I, J, D;
-    PQitem(int i, int j, int d)
-        :I(i), J(j), D(d) {};
-    bool operator<(const PQitem& that) const {
-        return this->D > that.D;
+struct Edge {
+    int i, j, d;
+    Edge(int i, int j, int d)
+        :i(i), j(j), d(d) {};
+    bool operator<(const Edge& that) const {
+        return d > that.d;
     };
 };
-priority_queue<PQitem> PQ;
 
-int parent[MAX], height[MAX];
-int leader(int x)
-{
-    int& p = parent[x];
-    if (p == x) return p;
-    return p = leader(p);
-}
-bool unite(int x, int y)
-{
-    int X = leader(x), Y = leader(y);
-    if (X == Y) return 0;
-    int& hX = height[X], & hY = height[Y];
-    if (hX < hY)
-        parent[X] = Y;
-    else {
-        parent[Y] = X;
-        if (hX == hY) hX++;
+class union_find {
+    vector<int> ar;
+public:
+    union_find(int sz) : ar(sz, -1) {}
+    int find(int x) {
+        if (ar[x] < 0) return x;
+        return ar[x] = find(ar[x]);
     }
-    return 1;
-}
-int main()
-{
-    ios_base::sync_with_stdio(0); cin.tie(0);
-
-    int N;
-    int T, i, j, d;
-    long long S = 0;
-
-    cin >> N;
-    iota(parent, parent + N, 0);
-    fill_n(height, N, 0);
-    for (i = 0; i < N; ++i) {
-        Point& P = points[i];
-        P.id = i;
-        cin >> P.pos[0] >> P.pos[1] >> P.pos[2];
+    bool unite(int x, int y) {
+        x = find(x), y = find(y);
+        if (x == y) return false;
+        if (ar[x] < ar[y]) ar[y] = x;
+        else {
+            if (ar[x] == ar[y]) --ar[y];
+            ar[x] = y;
+        }
+        return true;
     }
-    for (i = 0; i < 3; ++i) {
-        sort(points, points + N, PointCmp[i]);
-        for (j = 1; j < N; ++j) {
-            Point& P1 = points[j], & P2 = points[j - 1];
-            PQ.emplace(P1.id, P2.id, P1.pos[i] - P2.pos[i]);
+};
+
+int main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr); cout.tie(nullptr);
+
+    int N; cin >> N;
+    vector<Point> points(N);
+    for (int i = 0; i < N; ++i) {
+        auto& p = points[i];
+        p.id = i;
+        cin >> p.pos[0] >> p.pos[1] >> p.pos[2];
+    }
+
+    priority_queue<Edge> pq;
+    for (int d = 0; d < 3; ++d) {
+        sort(points.begin(), points.end(), [d](const Point& p, const Point& q) {
+            return p.pos[d] < q.pos[d];
+        });
+        for (int i = 1; i < N; ++i) {
+            auto& p1 = points[i], & p2 = points[i - 1];
+            pq.emplace(p1.id, p2.id, p1.pos[d] - p2.pos[d]);
         }
     }
-    T = N - 1;
-    while (T) {
-        const PQitem& it = PQ.top();
-        tie(i, j, d) = make_tuple(it.I, it.J, it.D);
-        PQ.pop();
-        if (unite(i, j)) {
-            T--; S += d;
-        }
+
+    union_find uf(N);
+    int cnt = N - 1;
+    uint64_t ans = 0ull;
+    while (cnt) {
+        auto& e = pq.top();
+        if (uf.unite(e.i, e.j)) { cnt--; ans += e.d; }
+        pq.pop();
     }
-    cout << S << '\n';
+    cout << ans << '\n';
 
     return 0;
 }

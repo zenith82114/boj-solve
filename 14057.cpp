@@ -6,7 +6,7 @@
 #include<bits/stdc++.h>
 using namespace std;
 
-vector<int> hei, hei_s, dp, opt;
+vector<int> hei_s;
 struct Item {
     int val, idx;
     Item(int v, int i) : val(v), idx(i) {}
@@ -22,23 +22,24 @@ inline int rtoh(int r) {
 }
 
 int main() {
-    ios::sync_with_stdio(0);
-    cin.tie(0); cout.tie(0);
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr); cout.tie(nullptr);
 
     int N, K; cin >> N >> K;
-    hei.resize(N);
-    for (int& h : hei)
-        cin >> h;
+    vector<int> hei(N);
+    for (int& h : hei) cin >> h;
+
     hei_s = hei;
     sort(hei_s.begin(), hei_s.end());
     hei_s.erase(unique(hei_s.begin(), hei_s.end()), hei_s.end());
+
     int M = hei_s.size();
-    dp.resize(M, 0);
-    opt.resize(M, -1);
+    vector<int> dp(M, 0);
+    vector<int> opt(M, -1);
 
     int r1 = 0, r2 = 0;
     int d;
-    for (int n=0; n<N; ++n) {
+    for (int n = 0; n < N; ++n) {
         d = 2;
         while (!stk.empty() && stk.top().val <= hei[n]) {
             stk.pop();
@@ -82,7 +83,7 @@ int main() {
             r1 = r2;
         }
     }
-    for (int i=1; i<M; ++i)
+    for (int i = 1; i < M; ++i)
         dp[i] = max(dp[i], dp[i-1]);
 
     while (K--) {

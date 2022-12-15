@@ -10,7 +10,7 @@ class Trie {
     struct Node {
         char chr;
         int pos;
-        bool isEntry = false;
+        bool is_entry = false;
         vector<int> chld;
         int prnt = -1, sufx = 0, dict = -1;
         Node(char c, int i) : chr(c), pos(i) {}
@@ -23,12 +23,12 @@ public:
         nodes.emplace_back(0, 0);
         nodes[0].sufx = -1;
     }
-    void addEntry(string& pattern) {
-        int curr = 0, next;
+    void add_entry(string& pattern) {
+        int curr = 0;
         int P = pattern.length();
-        for (int pos=0; pos<P; pos++) {
-            next = V;
-            for (int& i : nodes[curr].chld) {
+        for (int pos = 0; pos < P; ++pos) {
+            int next = V;
+            for (const int& i : nodes[curr].chld) {
                 if (nodes[i].chr == pattern[pos]) {
                     next = i;
                     break;
@@ -41,17 +41,16 @@ public:
             }
             curr = next;
         }
-        nodes[curr].isEntry = true;
+        nodes[curr].is_entry = true;
     }
-    void makeEdges() {
+    void make_edges() {
         queue<int> q;
-        int curr, temp;
         q.push(0);
         while (!q.empty()) {
-            curr = q.front(); q.pop();
+            int curr = q.front(); q.pop();
             for (int& i : nodes[curr].chld)
                 q.push(i);
-            temp = nodes[curr].prnt;
+            int temp = nodes[curr].prnt;
             while (temp > 0 && !nodes[curr].sufx) {
                 temp = nodes[temp].sufx;
                 for (int& i : nodes[temp].chld) {
@@ -62,17 +61,17 @@ public:
                 }
             }
             temp = nodes[curr].sufx;
-            while (temp > 0 && !nodes[temp].isEntry)
+            while (temp > 0 && !nodes[temp].is_entry)
                 temp = nodes[temp].sufx;
             if (temp > 0)
                 nodes[curr].dict = temp;
         }
     }
     void search(string& text, vector<pair<int, int>>& match) {
-        int curr = 0, next;
+        int curr = 0;
         int T = text.length();
-        for (int pos=0; pos<T; pos++) {
-            next = 0;
+        for (int pos = 0; pos < T; ++pos) {
+            int next = 0;
             while (!next) {
                 for (int& i : nodes[curr].chld) {
                     if (nodes[i].chr == text[pos]) {
@@ -85,7 +84,7 @@ public:
                 else break;
             }
             curr = next;
-            if (nodes[next].isEntry)
+            if (nodes[next].is_entry)
                 match.emplace_back(pos, nodes[next].pos);
             while (nodes[next].dict > 0) {
                 next = nodes[next].dict;
@@ -96,25 +95,24 @@ public:
 } trie;
 
 int main() {
-    ios::sync_with_stdio(0);
-    cin.tie(0); cout.tie(0);
-    vector<pair<int, int>> v;
-    string T, P;
-    int N, M, l, nl, nr, cnt;
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr); cout.tie(nullptr);
 
-    cin >> N >> T >> M;
+    int N, M; string text;
+    cin >> N >> text >> M;
     trie.init();
     while (M--) {
-        cin >> P;
-        trie.addEntry(P);
+        string pattern; cin >> pattern;
+        trie.add_entry(pattern);
     }
-    trie.makeEdges();
-    trie.search(T, v);
+    trie.make_edges();
+    vector<pair<int, int>> v;
+    trie.search(text, v);
 
-    l = cnt = N;
-    for (auto it=v.rbegin(); it!=v.rend(); it++) {
-        nr = it->first;
-        nl = nr - it->second;
+    int l = N, cnt = N;
+    for (auto rit = v.rbegin(); rit != v.rend(); ++rit) {
+        int nr = rit->first;
+        int nl = nr - rit->second;
         if (nl < l) {
             cnt -= (nr < l ? nr+1 : l) - nl;
             l = nl;

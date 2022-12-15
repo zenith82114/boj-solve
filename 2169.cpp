@@ -12,15 +12,14 @@ array< array<int, 1001>, 1001> dp;
 array<int, 1001> temp1, temp2;
 
 int main() {
-    ios_base::sync_with_stdio(0); cin.tie(0);
-    int N, M, v;
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr); cout.tie(nullptr);
 
-    cin >> N >> M;
-    for (int n = 1; n <= N; n++) {
-        for (int m = 1; m <= M; m++) {
-            cin >> v;
-            val[n][m] = (char)v;
-        }
+    int N, M; cin >> N >> M;
+    for (int n = 1; n <= N; ++n)
+    for (int m = 1; m <= M; ++m) {
+        int v; cin >> v;
+        val[n][m] = (char)v;
     }
 
     dp[N][M] = val[N][M];

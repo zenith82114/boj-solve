@@ -7,7 +7,7 @@
 using namespace std;
 using ll = long long;
 
-class SegTree {
+class seg_tree {
     // t: total sum
     // p: max prefix sum
     // s: max suffix sum
@@ -15,14 +15,7 @@ class SegTree {
     struct Node { ll t = 0ll, p = 0ll, s = 0ll, a = 0ll; };
     vector<Node> tree;
     int N;
-    int ceil_pow2(int n) {
-        if (n & (n-1)) {
-            for (int i = 1; i < 32; i <<= 1)
-                n |= (n >> i);
-            return n+1;
-        }
-        return n;
-    }
+
     void merge_nodes(Node& n, Node& ln, Node& rn) {
         n.t = ln.t + rn.t;
         n.p = max(ln.p, ln.t + rn.p);
@@ -30,9 +23,16 @@ class SegTree {
         n.a = max({ ln.a, rn.a, ln.s + rn.p });
     }
 public:
-    SegTree(int sz) {
+    seg_tree(int sz) {
         N = sz;
-        tree.resize(ceil_pow2(N)<<1);
+        tree.resize(2 * [](int n) {
+            if (n & (n-1)) {
+                for (int i = 1; i < 32; i <<= 1)
+                    n |= (n >> i);
+                return n+1;
+            }
+            return n;
+        }(sz));
     }
     void init() {
         for (auto& node : tree)
@@ -40,9 +40,8 @@ public:
     }
     void add(int i, ll x) {
         int n = 1, s = 0, e = N-1;
-        int m;
         while (s != e) {
-            m = (s+e)>>1;
+            int m = (s+e)>>1;
             if (m < i) {
                 n = (n<<1)|1;
                 s = m+1;
@@ -70,13 +69,12 @@ public:
 struct Point { int x, y; ll val; };
 
 int main() {
-    ios::sync_with_stdio(0);
-    cin.tie(0); cout.tie(0);
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr); cout.tie(nullptr);
 
     int N; cin >> N;
     vector<Point> P(N);
-    for (auto& p : P)
-        cin >> p.x >> p.y >> p.val;
+    for (auto& p : P) cin >> p.x >> p.y >> p.val;
 
     // compress y
     sort(P.begin(), P.end(), [](const Point& lhs, const Point& rhs){
@@ -95,12 +93,12 @@ int main() {
         return lhs.x != rhs.x ? lhs.x < rhs.x : lhs.y < rhs.y;
     });
 
-    SegTree segt(N);
+    seg_tree segt(N);
     ll ans = 0ll;
-    for (int l = 0; l < N; l++) {
+    for (int l = 0; l < N; ++l) {
         if (l == 0 || P[l-1].x != P[l].x) {
             segt.init();
-            for (int r = l; r < N; r++) {
+            for (int r = l; r < N; ++r) {
                 segt.add(P[r].y, P[r].val);
                 if (r+1 == N || P[r].x != P[r+1].x)
                     ans = max(ans, segt.query());

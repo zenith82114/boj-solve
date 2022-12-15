@@ -1,6 +1,6 @@
 /*
  * Q6549a - Monotone stack
- * Date: 2022.3.13, 2022.9.22(revised)
+ * Date: 2022.3.13
  */
 
 #include<bits/stdc++.h>
@@ -8,8 +8,8 @@ using namespace std;
 using pii = pair<int, int>;
 
 int main() {
-    ios::sync_with_stdio(0);
-    cin.tie(0); cout.tie(0);
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr); cout.tie(nullptr);
 
     int N; cin >> N;
     while (N) {
