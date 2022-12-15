@@ -4,7 +4,7 @@
 ## Environment
 
 - Ubuntu 20.04.5 LTS
-- gcc 11.1.0
+- g++ 11.1.0
 - std c++17
 
 ## Problem source
