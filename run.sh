@@ -1,11 +1,14 @@
 #!/bin/bash
 
 if [ "$#" -ne 1 ]; then
-    echo "Usage: $0 {problem number}.cpp"
+    echo "Usage: $0 {problem number}"
 	exit 1
 fi
-if [ ! -f "$1" ]; then
-    echo "$1 does not exist!"
+
+SRC="src/$1.cpp"
+
+if [ ! -f $SRC ]; then
+    echo "$SRC does not exist!"
     exit 1
 fi
 if [ ! -f "./input.txt" ]; then
@@ -13,8 +16,8 @@ if [ ! -f "./input.txt" ]; then
     exit 1
 fi
 
-echo "Compiling $1..."
-g++-11 -std=c++17 -Wall -O3 $1 -o solve
+echo "Compiling $SRC..."
+g++-11 -std=c++17 -Wall -O3 $SRC -o solve
 
 echo "Running..."
 echo -e "================================"
