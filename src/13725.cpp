@@ -13,7 +13,10 @@ using namespace std;
 struct mint {
     int val;
     mint() : val(0) {}
-    mint(int v) : val(v) {}
+    mint(int v) {
+        val = (-MOD <= v && v < MOD)? v : v % MOD;
+        if (val < 0) val += MOD;
+    }
     mint(const mint& v) : val(v.val) {}
     mint operator+(const mint &that) const {
         return mint(val) += that;
@@ -41,10 +44,6 @@ struct mint {
     }
     mint& operator/=(const mint &that) {
         return (*this) *= that.inv();
-    }
-    mint& operator-() {
-        val = (MOD - val) % MOD;
-        return (*this);
     }
     bool operator!() const {
         return !val;
@@ -134,7 +133,7 @@ poly poly_inv(poly A, int m) {
     for (int k = 1; k < m; k <<= 1) {
         poly S(A.begin(), A.begin() + min(sz, k<<1));
         S = poly_mul(S, R);
-        for (mint& s : S) s = -s;
+        for (mint& s : S) s *= -1;
         S[0] += 2;
         R = poly_mul(R, S);
         trunc(R, k<<1);
@@ -170,7 +169,7 @@ poly kitamasa(poly C, int64_t n) {
     poly D = { 1 };
     poly F = { 0, 1 };
     reverse(C.begin(), C.end());
-    for (mint& c : C) c = -c;
+    for (mint& c : C) c *= -1;
     C.emplace_back(1);
 
     while (n) {
@@ -204,6 +203,6 @@ int main() {
     for (int i = 0; i < (int)D.size(); ++i)
         ans += A[i] * D[i];
 
-    cout << ans.val << endl;
+    cout << ans.val << '\n';
     return 0;
 }

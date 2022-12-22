@@ -13,7 +13,6 @@ int main() {
 
     int N; cin >> N;
     while (N) {
-        int h, nb, hb;
         ulong M = 0;
         stack<pii> stk;
         for (int n = 0; n < N; ++n) {

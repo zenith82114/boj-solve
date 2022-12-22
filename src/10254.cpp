@@ -29,13 +29,6 @@ int ccw(const vec2& o, const vec2& p, const vec2& q) {
     return (k < 0) ? -1 : (k > 0);
 }
 
-// increasing order in angle, then in radius
-vec2 orig;
-bool polar_sort(const vec2& p, const vec2& q) {
-    int k = ccw(orig,p,q);
-    return k != 0 ? k > 0 : dot(q-p, orig-p) < 0;
-}
-
 inline double dist(const vec2& p, const vec2& q) {
     return hypot(p.x - q.x, p.y - q.y);
 }
