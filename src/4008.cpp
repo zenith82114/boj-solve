@@ -1,5 +1,5 @@
 /*
- * Q4008 - Convex hui64 trick
+ * Q4008 - Convex hull trick
  * Date: 2022.2.15
  */
 
