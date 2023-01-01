@@ -93,7 +93,7 @@ int main() {
     M += K;
     while (M--) {
         int q; cin >> q;
-        int i, j, x;
+        int i, j; ll x;
         if (q&1) {
             cin >> i >> j >> x;
             segt.add(i, j, x);
