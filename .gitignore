@@ -1,2 +1,5 @@
 .vscode/
-input.txt
+*.txt
+*.py
+clear.sh
+src/[a-z]*
