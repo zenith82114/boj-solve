@@ -40,7 +40,6 @@ class PersistentSegTree {
         init_util(nodes[n].r, m+1, e);
     }
     void insert_util(int pn, int n, int s, int e, int i) {
-        if (i < s || e < i) return;
         if (s == e) {
             nodes[n].val++;
             return;
