@@ -79,7 +79,7 @@ void factorize(ulong N, vector<ulong>& v) {
         return;
     }
     // Pollard rho
-    ulong p;
+    ulong p = 1;
     for (ulong i = 1; i <= N; ++i) {
         ulong x = i, y = i;
         p = 1;
