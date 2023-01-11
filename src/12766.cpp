@@ -9,15 +9,15 @@ using namespace std;
 using graph = vector<vector<pair<int, int>>>;
 using i64 = int64_t;
 
-void dijkstra(int s, const graph& g, vector<int>& dist) {
+void dijkstra(int src, const graph& adj, vector<int>& dist) {
     priority_queue<pair<i64, int>> pq;
-    pq.emplace(0, s);
-    dist.resize(g.size(), INT_MAX);
-    dist[s] = 0ll;
+    pq.emplace(0, src);
+    dist.resize(adj.size(), INT_MAX);
+    dist[src] = 0L;
 
     while (!pq.empty()) {
         auto [d, u] = pq.top(); pq.pop(); d = -d;
-        for (const auto& [v, l] : g[u]) if (dist[v] > d + l) {
+        for (const auto& [v, l] : adj[u]) if (dist[v] > d + l) {
             dist[v] = d + l;
             pq.emplace(-dist[v], v);
         }
@@ -57,7 +57,7 @@ int main() {
     vector<int> d, dt;
     dijkstra(B+1, g, d);
     dijkstra(B+1, gt, dt);
-    pfs.resize(B+1, 0ll);
+    pfs.resize(B+1, 0L);
     for (int j = 1; j <= B; ++j) pfs[j] = d[j] + dt[j];
     sort(pfs.begin(), pfs.end());
     partial_sum(pfs.begin(), pfs.end(), pfs.begin());
