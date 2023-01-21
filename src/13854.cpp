@@ -88,9 +88,6 @@ void ctd(int pc, int u, vector<cpx>& vd, vector<int>& vl) {
     sel[c] = true;
 
     vector<int> vv;
-    // vector<cpx> tvl;
-    // vector<vector<cpx>> vvd;
-    // vector<vector<int>> vvl;
     for (int& v : adj[c]) if (!sel[v])
         vv.emplace_back(v);
     int nv = (int)vv.size();

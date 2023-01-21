@@ -83,7 +83,6 @@ void ctd(int pc, int u) {
 int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr); cout.tie(nullptr);
-    // int N, M, u, v, q, r;
 
     int N; cin >> N;
     for (int n = 1; n < N; ++n) {
