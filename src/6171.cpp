@@ -43,21 +43,19 @@ int main() {
     deque<Line> hl;
     int sz = 0;
 
-    for (int i = 0; i+1 < N; ++i) {
-        Line ln(dp, A[i+1].h);
+    for (int i = 1; i < N; ++i) {
+        Line ln(dp, A[i].h);
 
-        // add line i
         while (sz > 1 && cx(ln, hl[sz-1]) <= cx(hl[sz-1], hl[sz-2]))
             sz--, hl.pop_back();
         sz++, hl.emplace_back(ln);
 
-        // compute dp[i+1]
-        while (sz > 1 && cx(hl[1], hl[0]) < A[i+1].w)
+        while (sz > 1 && cx(hl[1], hl[0]) < A[i].w)
             sz--, hl.pop_front();
-        dp = hl[0].y0 + hl[0].m * A[i+1].w;
-        dp = min(dp, (i64)A[i+1].w * A[0].h);
+        dp = hl[0].y0 + hl[0].m * A[i].w;
+        dp = min(dp, (i64)A[i].w * A[0].h);
     }
 
-    cout << dp << endl;
+    cout << dp;
     return 0;
 }
