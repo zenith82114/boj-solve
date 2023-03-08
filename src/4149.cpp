@@ -1,112 +1,94 @@
 /*
  * Q4149 - Miller-Rabin primality test and Pollard's rho alg.
- * Date: 2022.2.2
+ * Date: 2023.3.8
  */
 
 #include<bits/stdc++.h>
 using namespace std;
+using u64 = uint64_t;
 
-ulong mul_mod(const ulong A, const ulong B, const ulong p) {
-    ulong a = A%p;
-    ulong b = B%p;
-    ulong r = b&1 ? a : 0;
-    while (b >>= 1) {
-        a = (a<<1) % p;
-        if (b&1)
-            r = (a+r) % p;
+u64 mul_mod(u64 a, u64 b, u64 n) {
+    u64 r = 0;
+    a %= n;
+    b %= n;
+    for (; b; b >>= 1) {
+        if (b&1) {
+            r += a;
+            r = r >= n? r - n : r;
+        }
+        a <<= 1;
+        a = a >= n? a - n : a;
     }
     return r;
 }
-ulong pow_mod(const ulong A, const ulong B, const ulong p) {
-    ulong a = A%p;
-    ulong b = B;
-    ulong r = b&1 ? a : 1;
-    while (b >>= 1) {
-        a = mul_mod(a, a, p);
-        if (b&1)
-            r = mul_mod(a, r, p);
+
+u64 pow_mod(u64 a, u64 b, u64 n) {
+    u64 r = 1;
+    a %= n;
+    for (; b; b >>= 1) {
+        if (b&1) r = mul_mod(a, r, n);
+        a = mul_mod(a, a, n);
     }
     return r;
 }
-default_random_engine gen;
-bool probable_prime(const ulong p, const ulong q, const ulong r,
-uniform_int_distribution<ulong>& dist) {
-    ulong x, y;
-    x = dist(gen);
-    y = pow_mod(x, q, p);
-    if (y == 1)
-        return true;
-    for (ulong i = 0; i < r; ++i) {
-        if (y == p-1)
-            return true;
-        y = mul_mod(y, y, p);
-        if (y == 1)
-            return false;
+
+bool probable_prime(u64 n, u64 d, int s, int a) {
+    u64 x = pow_mod(a, d, n);
+    if (x == 1) return true;
+    while (s--) {
+        if (x == n-1) return true;
+        x = mul_mod(x, x, n);
+        if (x == 1) return false;
     }
     return false;
 }
-constexpr int trial = 20;
-bool miller_rabin(ulong p) {
-    uniform_int_distribution<ulong> dist(2, p-1);
-    ulong q = p-1, r = 0;
-        while (!(q&1)) {
-        q >>= 1;
-        r++;
-    }
-    for (int i = 0; i < trial; ++i) {
-        if (!probable_prime(p, q, r, dist))
-            return false;
+
+bool miller_rabin(u64 n) {
+    u64 d = n-1;
+    int s = 0;
+    while (~d&1)
+        d >>= 1, ++s;
+    for (int a : {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37}) {
+        if (n == (u64)a) return true;
+        if (!probable_prime(n, d, s, a)) return false;
     }
     return true;
 }
 
-inline ulong diff(ulong x, ulong y) {
-    return x>y ? x-y : y-x;
-}
-inline ulong G(ulong x, ulong N) {
-    return (mul_mod(x, x, N)+1)%N;
-}
-ulong gcd(ulong a, ulong b) {
-    while (b) {
-        a %= b;
-        swap(a, b);
-    }
-    return a;
-}
-void factorize(ulong N, vector<ulong>& v) {
-    if (miller_rabin(N)) {
-        v.push_back(N);
+void factorize(u64 n, vector<u64>& v) {
+    if (miller_rabin(n)) {
+        v.push_back(n);
         return;
     }
-    // Pollard rho
-    ulong p = 1;
-    for (ulong i = 1; i <= N; ++i) {
-        ulong x = i, y = i;
+
+    const auto G = [] (u64 x, u64 n) {
+        return (mul_mod(x, x, n) + 1) % n;
+    };
+    u64 p = 1;
+    for (u64 i = 1; i <= n; ++i) {
+        u64 x = i, y = i;
         p = 1;
         while (p == 1) {
-            x = G(x, N);
-            y = G(G(y, N), N);
-            p = gcd(N, diff(x, y));
+            x = G(x, n);
+            y = G(G(y, n), n);
+            p = gcd(n, x > y? x - y : y - x);
         }
-        if (p != N)
-            break;
+        if (p != n) break;
     }
-    // success: recurse
-    if (p != N) {
+
+    if (p != n) {
         factorize(p, v);
-        factorize(N/p, v);
+        factorize(n/p, v);
     }
-    // failure: bruteforce
     else {
-        for (p = 3; p*p <= N; p += 2) {
-            if (N%p == 0) {
+        for (p = 3; p*p <= n; p += 2) {
+            if (n%p == 0) {
                 v.push_back(p);
-                factorize(N/p, v);
+                factorize(n/p, v);
                 return;
             }
         }
-        // here N is prime
-        v.push_back(N);
+        v.push_back(n);
     }
 }
 
@@ -114,9 +96,9 @@ int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr); cout.tie(nullptr);
 
-    ulong N; cin >> N;
-    vector<ulong> v;
-    while (!(N&1)) {
+    u64 N; cin >> N;
+    vector<u64> v;
+    while (~N & 1) {
         N >>= 1;
         v.push_back(2);
     }
