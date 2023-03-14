@@ -1,6 +1,10 @@
 /*
  * Q22360 - Smaller to Larger
  * Date: 2023.3.14
+ *
+ * [Note]
+ * Large test cases may require greater stack size
+ * e.g. $ ulimit -s 262144
  */
 
 #include<bits/stdc++.h>
