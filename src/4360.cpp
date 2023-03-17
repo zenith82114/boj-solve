@@ -54,9 +54,9 @@ int main() {
     for (int i = 0; i < 2000; ++i) {
         vec2 grad(0.0, 0.0);
         for (const auto& p : pts) {
-            vec2 qp = q - p;
-            if (qp.norm() > eps)
-                grad += qp.normalized();
+            vec2 pq = q - p;
+            if (pq.norm() > eps)
+                grad += pq.normalized();
         }
         if (grad.norm() < eps) break;
 
