@@ -50,7 +50,6 @@ int dfs(int u, int f) {
 int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr); cout.tie(nullptr);
-    // int N, u, v, f, F;
 
     int N; cin >> N;
     S = 0, T = N+1;
