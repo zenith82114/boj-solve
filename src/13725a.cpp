@@ -18,7 +18,7 @@ struct mint {
     mint(const mint& x): val(x.val) {}
 
     friend istream& operator>>(istream& is, mint& x) {
-        int v; cin >> v; x = mint(v); return is;
+        int v; is >> v; x = mint(v); return is;
     }
     friend ostream& operator<<(ostream& os, const mint& x) {
         return os << x.val;
