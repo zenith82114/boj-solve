@@ -8,9 +8,9 @@ using namespace std;
 
 class splay_tree {
     struct node {
+        node *l, *r, *p;
         int val, sz, val_min, val_max;
         bool rev;
-        node *l, *r, *p;
         node(int v) :
             val(v), rev(false), l(nullptr), r(nullptr), p(nullptr) {}
         ~node() {

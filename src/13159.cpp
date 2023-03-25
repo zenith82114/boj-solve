@@ -9,10 +9,10 @@ using ll = long long;
 
 class splay_tree {
     struct node {
-        int val, sz, val_min, val_max;
-        ll sum;
-        bool rev;
         node *l, *r, *p;
+        ll sum;
+        int val, sz, val_min, val_max;
+        bool rev;
         node(int v) :
             val(v), rev(false), l(nullptr), r(nullptr), p(nullptr) {}
         void update() {
