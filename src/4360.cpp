@@ -1,5 +1,5 @@
 /*
- * Q4360 - Geometric median; Gradient descent
+ * Q4360 - Geometric median; gradient descent
  * Date: 2023.1.19
  */
 
@@ -12,7 +12,9 @@ int main() {
 
     struct vec2 {
         double x, y;
+        vec2() = default;
         vec2(double x, double y): x(x), y(y) {}
+
         vec2& operator+=(const vec2& v) {
             x += v.x;
             y += v.y;
@@ -29,11 +31,6 @@ int main() {
         vec2 operator*(const double c) const {
             return vec2(c * x, c * y);
         }
-        vec2& operator/=(const double c) {
-            x /= c;
-            y /= c;
-            return *this;
-        }
         double norm() const { return hypot(x, y); }
         vec2 normalized() const {
             double norm = this->norm();
@@ -41,12 +38,9 @@ int main() {
         }
     };
 
-    vector<vec2> pts;
     int N; cin >> N;
-    for (int i = 0; i < N; ++i) {
-        double x, y; cin >> x >> y;
-        pts.emplace_back(x, y);
-    }
+    vector<vec2> pts(N);
+    for (auto& [x, y] : pts) cin >> x >> y;
 
     constexpr double eps = 1e-9;
     vec2 q(5000.0, 5000.0);
@@ -59,15 +53,13 @@ int main() {
                 grad += pq.normalized();
         }
         if (grad.norm() < eps) break;
-
         grad = grad.normalized();
         double step = i < 1000? 10.0 : 0.01;
         q -= grad * step;
     }
 
     double ans = 0.0;
-    for (const auto& p : pts)
-        ans += (q - p).norm();
+    for (const auto& p : pts) ans += (q - p).norm();
     cout << lrint(ans);
     return 0;
 }
