@@ -6,7 +6,7 @@
 #include<iostream>
 #include<algorithm>
 using namespace std;
-constexpr int MAX = 3000;
+constexpr int MAXN = 3000;
 
 struct vec2 {
     int x, y;
@@ -17,9 +17,8 @@ struct vec2 {
         return { x-v.x, y-v.y };
     }
 };
-struct Segment {
-    vec2 p1, p2;
-} segm[MAX];
+
+pair<vec2, vec2> segm[MAXN];
 
 int64_t cross(const vec2& v, const vec2& w) {
     return v.x*w.y - v.y*w.x;
@@ -29,8 +28,8 @@ int ccw(const vec2& o, const vec2& p, const vec2& q) {
     return (k < 0) ? -1 : (k > 0);
 }
 bool intersects(int i, int j) {
-    vec2 &a = segm[i].p1, &b = segm[i].p2;
-    vec2 &c = segm[j].p1, &d = segm[j].p2;
+    auto& [a, b] = segm[i];
+    auto& [c, d] = segm[j];
     int ab = ccw(a,b,c) * ccw(a,b,d);
     int cd = ccw(c,d,a) * ccw(c,d,b);
     if (!(ab || cd)) {
@@ -41,28 +40,18 @@ bool intersects(int i, int j) {
     return ab <= 0 && cd <= 0;
 }
 
-struct Data {
-    int par, rnk, sz;
-} db[MAX];
+int ar[MAXN];
 
 int find(int x) {
-    int& p = db[x].par;
-    if (x == p) return p;
-    return p = find(p);
+    if (ar[x] < 0) return x;
+    return ar[x] = find(ar[x]);
 }
 int unite(int x, int y) {
-    int X = find(x), Y = find(y);
-    Data& dX = db[X], & dY = db[Y];
-    if (X == Y) return 0;
-    int& hX = dX.rnk, & hY = dY.rnk;
-    if (hX < hY) {
-        dX.par = Y;
-        return dY.sz += dX.sz;
-    } else {
-        dY.par = X;
-        if (hX == hY) hX++;
-        return dX.sz += dY.sz;
-    }
+    x = find(x), y = find(y);
+    if (ar[x] > ar[y]) swap(x, y);
+    ar[x] += ar[y];
+    ar[y] = x;
+    return -ar[x];
 }
 
 int main() {
@@ -73,9 +62,9 @@ int main() {
     int nG = N;
     int maxG = 1;
     for (int n = 0; n < N; ++n) {
-        db[n] = {n, 0, 1};
-        auto& s = segm[n];
-        cin >> s.p1.x >> s.p1.y >> s.p2.x >> s.p2.y;
+        ar[n] = -1;
+        auto& [a, b] = segm[n];
+        cin >> a.x >> a.y >> b.x >> b.y;
         for (int m = 0; m < n; ++m) {
             if (find(m) != find(n) && intersects(m, n)) {
                 nG--;
