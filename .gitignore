@@ -1,5 +1,5 @@
 .vscode/
 *.txt
 *.py
-clear.sh
+*.sh
 src/[a-z]*
