@@ -1,63 +1,45 @@
 /*
- * Q2213 - Maximum independent set on a tree
- * Date: 2021.8.7
+ * Q2213 - Tree DP
+ * Date: 2023.4.22
  */
 
-#include<iostream>
-#include<algorithm>
-#include<vector>
+#include<bits/stdc++.h>
 using namespace std;
-constexpr int MAX = 10000;
 
-vector<int> adj[MAX + 1];
-int weight[MAX + 1], dp[MAX + 1][2];
+vector<int> tree[10001];
+int sum[10001][2];
+bool opt[10001];
 
-pair<vector<int>, vector<int>> max_indep_sum(int v, int pv) {
-    vector<int> set_vInc = { v }, set_vExc;
-    int& size_vInc = dp[v][0], & size_vExc = dp[v][1];
-    size_vInc += weight[v];
-
-    for (int& u : adj[v]) {
-        if (u == pv) continue;
-        auto p = max_indep_sum(u, v);
-        auto& set_uInc = p.first, & set_uExc = p.second;
-        int& size_uInc = dp[u][0], & size_uExc = dp[u][1];
-        set_vInc.insert(set_vInc.end(), set_uExc.begin(), set_uExc.end());
-        size_vInc += size_uExc;
-        if (size_uInc > size_uExc) {
-            set_vExc.insert(set_vExc.end(), set_uInc.begin(), set_uInc.end());
-            size_vExc += size_uInc;
-        } else {
-            set_vExc.insert(set_vExc.end(), set_uExc.begin(), set_uExc.end());
-            size_vExc += size_uExc;
-        }
+void dfs1(int pu, int u) {
+    for (int v : tree[u]) if (v != pu) {
+        dfs1(u, v);
+        sum[u][0] += max(sum[v][0], sum[v][1]);
+        sum[u][1] += sum[v][0];
     }
-    return { set_vInc, set_vExc };
+}
+
+void dfs2(int pu, int u) {
+    opt[u] = !opt[pu] && sum[u][0] < sum[u][1];
+    for (int v : tree[u]) if (v != pu) dfs2(u, v);
 }
 
 int main() {
     ios_base::sync_with_stdio(false);
-    cin.tie(nullptr); cout.tie(nullptr);
+    cin.tie(0); cout.tie(0);
 
     int N; cin >> N;
-    for (int n = 1; n <= N; cin >> weight[n++]);
-    for (int n = 1; n < N; ++n) {
+    for (int i = 1; i <= N; ++i) cin >> sum[i][1];
+
+    for (int i = 1; i < N; ++i) {
         int u, v; cin >> u >> v;
-        adj[u].push_back(v);
-        adj[v].push_back(u);
+        tree[u].emplace_back(v);
+        tree[v].emplace_back(u);
     }
 
-    auto p = max_indep_sum(1, 0);
-    auto& p0 = p.first, & p1 = p.second;
-    cout << max(dp[1][0], dp[1][1]) << '\n';
-    if (dp[1][0] > dp[1][1]) {
-        sort(p0.begin(), p0.end());
-        for (int& i : p0) cout << i << ' ';
-    } else {
-        sort(p1.begin(), p1.end());
-        for (int& i : p1) cout << i << ' ';
-    }
-    cout << '\n';
+    dfs1(0, 1);
+    cout << max(sum[1][0], sum[1][1]) << '\n';
+    dfs2(0, 1);
+    for (int i = 1; i <= N; ++i) if (opt[i]) cout << i << ' ';
 
     return 0;
 }
