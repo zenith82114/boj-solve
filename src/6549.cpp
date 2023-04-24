@@ -1,56 +1,40 @@
 /*
- * Q6549 - Largest rectangle in a histogram w/ sparse table
- * Date: 2021.7.11
+ * Q6549 - DnC + Greedy
+ * Date: 2023.4.24
  */
 
-#include<iostream>
-#include<algorithm>
-#include<array>
+#include<bits/stdc++.h>
 using namespace std;
+using i64 = int64_t;
 
-array<array<int, 100000>, 17> A;
-array<int, 100000> H;
+vector<i64> H;
 
-int floor_log2(int n) {
-    int k = 0;
-    while (n >>= 1) ++k;
-    return k;
-}
-
-int range_min(int l, int r) {
-    int m = floor_log2(r-l+1);
-    int d = 1<<m;
-    int a1 = A[m][l], a2 = A[m][r-d+1];
-    return (H[a1] < H[a2] ? a1 : a2);
-}
-
-int64_t max_rect_area(int l, int r) {
-    if (l > r)
-        return -1;
-    if (l == r)
-        return (int64_t)H[l];
-    int m = range_min(l, r);
-    auto a = max(max_rect_area(l, m-1), max_rect_area(m+1, r));
-    return max(a, (int64_t)H[m] * (r-l+1));
+i64 dnc(int l, int r) {
+    if (l == r) return H[l];
+    i64 minh = INT_MAX;
+    i64 ans = 0;
+    int m = (l + r) >> 1;
+    int i = m, j = m+1;
+    while (l <= i && j <= r) {
+        minh = min(minh, min(H[i], H[j]));
+        ans = max(ans, (j-i+1) * minh);
+        if (l == i) ++j;
+        else if (j == r) --i;
+        else if (H[i-1] < H[j+1]) ++j; else --i;
+    }
+    return max({ ans, dnc(l, m), dnc(m+1, r) });
 }
 
 int main() {
     ios_base::sync_with_stdio(false);
-    cin.tie(nullptr); cout.tie(nullptr);
+    cin.tie(0); cout.tie(0);
 
-    int N;
-    while (cin >> N) {
-        if (!N) break;
-        for (int n = 0; n < N; ++n) cin >> H[n];
-        int M = 1 + floor_log2(N);
-        for (int n = 0; n < N; ++n) A[0][n] = n;
-        for (int m = 1, d = 1; m < M; ++m, d <<= 1) {
-            for (int n = 0; n + (d<<1) <= N; ++n) {
-                int a1 = A[m-1][n], a2 = A[m-1][n+d];
-                A[m][n] = (H[a1] < H[a2] ? a1 : a2);
-            }
-        }
-        cout << max_rect_area(0, N-1) << '\n';
+    int N; cin >> N;
+    while (N) {
+        H.resize(N);
+        for (i64& h : H) cin >> h;
+        cout << dnc(0, N-1) << '\n';
+        cin >> N;
     }
 
     return 0;
