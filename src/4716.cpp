@@ -1,6 +1,6 @@
 /*
  * Q4716 - Greedy
- * Date: 2023.4.22
+ * Date: 2023.5.1
  */
 
 #include<bits/stdc++.h>
@@ -13,24 +13,25 @@ int main() {
     int N, A, B; cin >> N >> A >> B;
     while (N | A | B) {
         vector<int> K(N);
-        vector<tuple<int, int, int, bool> > v;
-
-        for (int i = 0; i < N; ++i) {
-            int a, b; cin >> K[i] >> a >> b;
-            int w = - abs(a - b);
-            v.emplace_back(w, a, i, true);
-            v.emplace_back(w, b, i, false);
-        }
-        sort(v.begin(), v.end());
+        vector<tuple<int, int, bool> > v;
 
         int ans = 0;
-        for (auto& [w, d, i, q] : v) {
+        for (int i = 0; i < N; ++i) {
+            int a, b; cin >> K[i] >> a >> b;
+            ans += K[i] * min(a, b);
+            v.emplace_back(-abs(a - b), i, a < b);
+        }
+        sort(v.begin(), v.end());
+        for (auto& [w, i, q] : v) {
             int& M = q? A : B;
             int x = min(M, K[i]);
-            M -= x;
-            K[i] -= x;
-            ans += x * d;
+            M -= x; K[i] -= x;
+            if (K[i]) {
+                (q? B : A) -= K[i];
+                ans -= K[i] * w;
+            }
         }
+
         cout << ans << '\n';
         cin >> N >> A >> B;
     }
