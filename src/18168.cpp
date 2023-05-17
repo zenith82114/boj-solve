@@ -131,6 +131,18 @@ poly poly_mod(const poly& A, poly B) {
     int a = A.size(), b = B.size();
     if (a < b) return A;
 
+    // naive division if not too large
+    if (b < 2048) {
+        poly R(A);
+        for (int i = a-1; i >= b-1; --i) {
+            mint k = R[i] / B.back();
+            for (int j = 0; j < b; ++j)
+                R[i-j] -= k * B[b-1-j];
+            R.pop_back();
+        }
+        return R;
+    }
+
     poly rA(A), rB(B);
     reverse(rA.begin(), rA.end()); trim(rA);
     reverse(rB.begin(), rB.end()); trim(rB);
@@ -162,17 +174,13 @@ void build_segt(int n, int s, int e) {
 }
 
 void dnc(int n, int s, int e, const poly& A) {
+    poly B = poly_mod(A, segt[n]);
     if (s != e) {
         int m = (s + e)>>1;
-        poly B = poly_mod(A, segt[n]);
         dnc(n<<1, s, m, B);
         dnc(n<<1|1, m+1, e, B);
     }
-    else {
-        Y[s] = A[0];
-        if (A.size() > 1) Y[s] += A[1] * X[s];
-        if (A.size() > 2) Y[s] += A[2] * X[s] * X[s];
-    }
+    else Y[s] = B[0];
 }
 
 int main() {
