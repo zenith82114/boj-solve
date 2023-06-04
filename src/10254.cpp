@@ -1,5 +1,5 @@
 /*
- * Q10254 - Farthest point pair on 2D w/ convex hull
+ * Q10254 - Rotating calipers
  * Date: 2023.6.5
  */
 
@@ -16,7 +16,7 @@ struct vec2 {
         return y != v.y ? y < v.y : x < v.x;
     };
     vec2 operator-(const vec2& v) const {
-        return { x-v.x, y-v.y };
+        return { x - v.x, y - v.y };
     }
 };
 i64 cross(const vec2& v, const vec2& w) {
@@ -25,9 +25,8 @@ i64 cross(const vec2& v, const vec2& w) {
 i64 dot(const vec2& v, const vec2& w) {
     return v.x*w.x + v.y*w.y;
 }
-int ccw(const vec2& o, const vec2& p, const vec2& q) {
-    auto k = cross(p-o, q-o);
-    return (k < 0) ? -1 : (k > 0);
+i64 ccw(const vec2& o, const vec2& p, const vec2& q) {
+    return cross(p - o, q - o);
 }
 
 inline double dist(const vec2& p, const vec2& q) {
@@ -35,68 +34,63 @@ inline double dist(const vec2& p, const vec2& q) {
 }
 
 int main() {
-    ios_base::sync_with_stdio(false);
-    cin.tie(nullptr); cout.tie(nullptr);
+    ios_base::sync_with_stdio(false); cin.tie(0);
 
     int TC; cin >> TC;
     while (TC--) {
         int N; cin >> N;
         vector<vec2> points(N);
+        for (auto& [x, y] : points) cin >> x >> y;
 
-        int argmin = 0;
-        for (int i = 0; i < N; ++i) {
-            vec2& p = points[i];
-            cin >> p.x >> p.y;
-            if (p < points[argmin]) argmin = i;
-        }
-        swap(points[0], points[argmin]);
-        vec2& orig = points[0];
-        sort(++points.begin(), points.end(), [&orig](const vec2& p, const vec2& q) {
-            int k = ccw(orig, p, q);
-            return k != 0 ? k > 0 : dot(q - p, orig - p) < 0;
+        swap(points[0], *min_element(points.begin(), points.end()));
+        vec2& p0 = points[0];
+        sort(++points.begin(), points.end(), [&p0] (const vec2& p1, const vec2& p2) {
+            i64 k = ccw(p0, p1, p2);
+            return k? k > 0 : dot(p2 - p1, p0 - p1) < 0;
         });
 
         int M = 0;
         vector<vec2> hull;
         for (const auto &p : points) {
             while (M > 1 && ccw(hull[M-2], hull[M-1], p) <= 0) {
-                hull.pop_back();
-                M--;
+                --M; hull.pop_back();
             }
-            hull.push_back(p);
-            M++;
+            ++M; hull.push_back(p);
         }
 
-        double d = 0.;
-        int P = 0, Q = 0;
+        auto area = [&hull] (int i, int j, int k) -> i64 {
+            return ccw(hull[i], hull[j], hull[k]);
+        };
+
+        double dmx = 0.;
+        pair<int, int> ans;
         if (M > 3) {
-            int i = 0, j = 1;
-            while (cross(hull[1] - hull[0], hull[(j+1)%M] - hull[j]) > 0)
-                j++;
-            int j0 = j;
-            while (i < j0) {
-                double _d = dist(hull[i], hull[j]);
-                if (d < _d) {
-                    d = _d; P = i; Q = j;
+            int j0 = 1;
+            while (j0 < M && area(M-1, 0, j0) < area(M-1, 0, j0+1))
+                ++j0;
+            int i = 0, j = j0;
+            while (i <= j0 && j < M) {
+                double d = dist(hull[i], hull[j]);
+                if (dmx < d) { dmx = d; ans = {i, j}; }
+                while (j < M && area(i, i+1, j) < area(i, i+1, (j+1)%M)) {
+                    ++j;
+                    double d = dist(hull[i], hull[j < M? j : 0]);
+                    if (dmx < d) { dmx = d; ans = {i, j < M? j : 0}; }
                 }
-                if (cross(hull[(i+1)%M] - hull[i], hull[(j+1)%M] - hull[j]) < 0)
-                    i = (i+1)%M;
-                else
-                    j = (j+1)%M;
+                ++i;
             }
         }
         else {
             for (int i = 0; i < M; ++i) {
                 int j = (i+1)%M;
-                double _d = dist(hull[i], hull[j]);
-                if (d < _d) {
-                    d = _d; P = i; Q = j;
-                }
+                double d = dist(hull[i], hull[j]);
+                if (dmx < d) { dmx = d; ans = {i, j}; }
             }
         }
 
-        cout << hull[P].x << ' ' << hull[P].y << ' '
-            << hull[Q].x << ' ' << hull[Q].y << '\n';
+        auto& [i, j] = ans;
+        auto& [xi, yi] = hull[i]; cout << xi << ' ' << yi << ' ';
+        auto& [xj, yj] = hull[j]; cout << xj << ' ' << yj << '\n';
     }
 
     return 0;
