@@ -1,6 +1,6 @@
 /*
  * Q10254 - Farthest point pair on 2D w/ convex hull
- * Date: 2022.1.21
+ * Date: 2023.6.5
  */
 
 #include<iostream>
@@ -8,9 +8,10 @@
 #include<vector>
 #include<cmath>
 using namespace std;
+using i64 = int64_t;
 
 struct vec2 {
-    int x, y;
+    i64 x, y;
     bool operator<(const vec2& v) const {
         return y != v.y ? y < v.y : x < v.x;
     };
@@ -18,10 +19,10 @@ struct vec2 {
         return { x-v.x, y-v.y };
     }
 };
-int64_t cross(const vec2& v, const vec2& w) {
+i64 cross(const vec2& v, const vec2& w) {
     return v.x*w.y - v.y*w.x;
 }
-int64_t dot(const vec2& v, const vec2& w) {
+i64 dot(const vec2& v, const vec2& w) {
     return v.x*w.x + v.y*w.y;
 }
 int ccw(const vec2& o, const vec2& p, const vec2& q) {
@@ -42,7 +43,6 @@ int main() {
         int N; cin >> N;
         vector<vec2> points(N);
 
-        // sort points
         int argmin = 0;
         for (int i = 0; i < N; ++i) {
             vec2& p = points[i];
@@ -56,7 +56,6 @@ int main() {
             return k != 0 ? k > 0 : dot(q - p, orig - p) < 0;
         });
 
-        // Graham scan
         int M = 0;
         vector<vec2> hull;
         for (const auto &p : points) {
@@ -68,7 +67,6 @@ int main() {
             M++;
         }
 
-        // Rotating calipers
         double d = 0.;
         int P = 0, Q = 0;
         if (M > 3) {
@@ -76,7 +74,7 @@ int main() {
             while (cross(hull[1] - hull[0], hull[(j+1)%M] - hull[j]) > 0)
                 j++;
             int j0 = j;
-            while (i < j0 && j < M) {
+            while (i < j0) {
                 double _d = dist(hull[i], hull[j]);
                 if (d < _d) {
                     d = _d; P = i; Q = j;
