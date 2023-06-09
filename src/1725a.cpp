@@ -1,18 +1,17 @@
 /*
- * Q6549 - DnC + Greedy
+ * Q1725a - DnC + Greedy
  * Date: 2023.4.24
  */
 
 #include<bits/stdc++.h>
 using namespace std;
-using i64 = int64_t;
 
-vector<i64> H;
+vector<int> H;
 
-i64 dnc(int l, int r) {
+int dnc(int l, int r) {
     if (l == r) return H[l];
-    i64 minh = INT_MAX;
-    i64 ans = 0;
+    int minh = INT_MAX;
+    int ans = 0;
     int m = (l + r) >> 1;
     int i = m, j = m+1;
     while (l <= i && j <= r) {
@@ -26,16 +25,11 @@ i64 dnc(int l, int r) {
 }
 
 int main() {
-    ios_base::sync_with_stdio(false);
-    cin.tie(0); cout.tie(0);
+    ios_base::sync_with_stdio(false); cin.tie(0);
 
     int N; cin >> N;
-    while (N) {
-        H.resize(N);
-        for (i64& h : H) cin >> h;
-        cout << dnc(0, N-1) << '\n';
-        cin >> N;
-    }
-
+    H.resize(N);
+    for (int& h : H) cin >> h;
+    cout << dnc(0, N-1);
     return 0;
 }
