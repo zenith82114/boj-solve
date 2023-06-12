@@ -1,21 +1,20 @@
 /*
- * Q3033 - Suffix array and LCP array
- * Date: 2022.9.19
+ * Q1605 - Suffix array and LCP array
+ * Date: 2022.2.7
  */
 
 #include<bits/stdc++.h>
 using namespace std;
 
 int main() {
-    ios_base::sync_with_stdio(false);
-    cin.tie(nullptr); cout.tie(nullptr);
+    ios_base::sync_with_stdio(false); cin.tie(0);
 
     int N; cin >> N;
     string S; cin >> S;
     int i;
 
     vector<int> rnk(N<<1);
-    vector<int> cnt(128, 0);
+    vector<int> cnt(128);
     for (i = 0; i < N; ++i) cnt[S[i]] = 1;
     for (i = 'a'; i < 'z'; ++i) cnt[i+1] += cnt[i];
     for (i = 0; i < N; ++i) rnk[i] = cnt[S[i]];
@@ -36,16 +35,14 @@ int main() {
         for (i = 1; i < N; ++i) cnt[i] += cnt[i-1];
         for (i = N-1; ~i; --i) sa[--cnt[rnk[tmp[i]]]] = tmp[i];
 
-        auto cmp = [&](int a, int b) {
-            return rnk[a] < rnk[b] ||
-            (rnk[a] == rnk[b] && rnk[a+d] < rnk[b+d]);
+        auto cmp = [&] (int a, int b) -> int {
+            return rnk[a] < rnk[b] || (rnk[a] == rnk[b] && rnk[a+d] < rnk[b+d]);
         };
         vector<int> nrnk(N<<1);
         nrnk[sa[0]] = 1;
         for (i = 1; i < N; ++i)
             nrnk[sa[i]] = nrnk[sa[i-1]] + cmp(sa[i-1], sa[i]);
-        if (nrnk[sa[N-1]] == N)
-            break;
+        if (nrnk[sa[N-1]] == N) break;
         swap(rnk, nrnk);
     }
 
@@ -60,8 +57,7 @@ int main() {
     }
 
     int ans = 0;
-    for (const int &l : lcp) ans = max(ans, l);
-    cout << ans << '\n';
-
+    for (int l : lcp) ans = max(ans, l);
+    cout << ans;
     return 0;
 }
