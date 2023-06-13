@@ -58,7 +58,7 @@ int main() {
         }
         for (int p : primes) {
             if (p > spf[i] || 1LL * i * p >= 32000LL) break;
-            spf[i * p] = i;
+            spf[i * p] = p;
         }
     }
 
