@@ -1,8 +1,6 @@
 /*
- * Q17467a - Lagrange interpolation + FFT
- * Date: 2023.5.19
- *
- * Disclaimer: hugely aided by ho94949's original solution
+ * Q17468 - Lagrange interpolation + FFT
+ * Date: 2023.6.15
  */
 
 #include<bits/stdc++.h>
@@ -13,23 +11,14 @@ using cpx = complex<double>;
 const double PI = acos(-1.);
 
 struct mint {
-    static int MOD;
-    int val;
+    static i64 MOD;
+    i64 val;
     mint(): val(0) {}
-    mint(int v) {
-        val = (-MOD <= v && v < MOD)? v : v % MOD;
-        if (val < 0) val += MOD;
-    }
+    mint(i64 v): val(v) {}
     mint(const mint& x): val(x.val) {}
 
-    friend istream& operator>>(istream& is, mint& x) {
-        int v; is >> v; x = mint(v); return is;
-    }
-    friend ostream& operator<<(ostream& os, const mint& x) {
-        return os << x.val;
-    }
     mint operator-() const { return mint(val? MOD - val : 0); }
-    mint pow(int e) const {
+    mint pow(i64 e) const {
         mint y(1), x(*this);
         for (; e; e >>= 1) { if (e&1) { y *= x; } x *= x; }
         return y;
@@ -51,14 +40,14 @@ struct mint {
     }
     mint operator*(const mint& x) const { return mint(*this) *= x; }
     mint& operator*=(const mint& x) {
-        val = (1LL * val * x.val) % MOD; return *this;
+        val = ((__int128_t)val * x.val) % MOD; return *this;
     }
     mint operator/(const mint& x) const { return mint(*this) /= x; }
     mint& operator/=(const mint& x) {
         return (*this) *= x.inv();
     }
 };
-int mint::MOD = 0;
+i64 mint::MOD = 0;
 
 void fft(vector<cpx>& A, bool inv = false) {
     int N = A.size();
@@ -82,38 +71,38 @@ void fft(vector<cpx>& A, bool inv = false) {
     if (inv) for (cpx& a : A) a /= N;
 }
 
-vector<mint> convolve(const vector<mint>& A, const vector<mint>& B) {
-    int sA = A.size(), sB = B.size();
+vector<mint> convolve(const vector<mint>& A, const vector<mint>& B, int sB) {
+    int sA = A.size();
     int sC = sA + sB - 1;
     int N = 1; while (N < sC) N <<= 1;
 
-    vector<cpx> A0(N), A1(N), B0(N), B1(N);
-    for (int i = 0; i < sA; ++i) {
-        A0[i] = A[i].val & 32767;
-        A1[i] = A[i].val >> 15;
-    }
-    for (int i = 0; i < sB; ++i) {
-        B0[i] = B[i].val & 32767;
-        B1[i] = B[i].val >> 15;
-    }
-    fft(A0), fft(A1), fft(B0), fft(B1);
+    vector<cpx> P(N), Q(N);
+    for (int i = 0; i < sA; ++i)
+        P[i] = cpx(A[i].val >> 17, A[i].val & 0x01ffff);
+    for (int i = 0; i < sB; ++i)
+        Q[i] = cpx(B[i].val >> 17, B[i].val & 0x01ffff);
+    fft(P); fft(Q);
 
-    vector<cpx> C0(N), C1(N), C2(N);
+    vector<cpx> R0(N), R1(N);
     for (int i = 0; i < N; ++i) {
-        C0[i] = A0[i] * B0[i];
-        C1[i] = A0[i] * B1[i] + A1[i] * B0[i];
-        C2[i] = A1[i] * B1[i];
+        int j = i? (N - i) : 0;
+        cpx p0 = (P[i] + conj(P[j])) * cpx(.5, 0);
+        cpx p1 = (P[i] - conj(P[j])) * cpx(0, -.5);
+        cpx q0 = (Q[i] + conj(Q[j])) * cpx(.5, 0);
+        cpx q1 = (Q[i] - conj(Q[j])) * cpx(0, -.5);
+        R0[i] = p0 * (q0 + q1 * cpx(0, 1));
+        R1[i] = p1 * (q0 + q1 * cpx(0, 1));
     }
-    fft(C0, true), fft(C1, true), fft(C2, true);
+    fft(R0, true); fft(R1, true);
 
     vector<mint> C(sC);
-    const int P = mint::MOD;
+    const i64 MOD = mint::MOD;
     for (int i = 0; i < sC; ++i) {
-        i64 c0 = llround(C0[i].real()) % P;
-        i64 c1 = llround(C1[i].real()) % P;
-        i64 c2 = llround(C2[i].real()) % P;
-        c1 += c2 << 15; c1 %= P;
-        c0 += c1 << 15; C[i] = c0 % P;
+        i64 c0 = llround(R0[i].real()) % MOD;
+        i64 c1 = llround(R0[i].imag() + R1[i].real()) % MOD;
+        i64 c2 = llround(R1[i].imag()) % MOD;
+        c1 += c0 << 17; c1 %= MOD;
+        c2 += c1 << 17; C[i] = c2 % MOD;
     }
     return C;
 }
@@ -121,46 +110,50 @@ vector<mint> convolve(const vector<mint>& A, const vector<mint>& B) {
 int main() {
     ios_base::sync_with_stdio(false); cin.tie(0);
 
-    int N; cin >> N >> mint::MOD;
+    i64 N; cin >> N >> mint::MOD;
 
-    vector<mint> f        { 1, 2 };
-    vector<mint> fact     { 1 };
-    vector<mint> fact_inv { 1 };
-    vector<mint> inv      { 0 };
+    i64 D = 1;
+    while (D*(D + 1) < N) D <<= 1;
 
-    int d = 1;
-    for (; d*(d + 1) < N; d <<= 1) {
-        for (int i = fact.size(); i < 4*d + 2; ++i)
-            fact.emplace_back(fact.back() * i);
+    vector<mint> fact(4*D + 2);
+    fact[0] = 1;
+    for (i64 i = 1; i < 4*D + 2; ++i)
+        fact[i] = fact[i-1] * i;
 
-        fact_inv.resize(fact.size());
-        fact_inv.back() = fact.back().inv();
-        for (int i = 4*d; fact_inv[i] == 0; --i)
-            fact_inv[i] = fact_inv[i+1] * (i+1);
+    vector<mint> fact_inv(4*D + 2);
+    i64 j = min(4*D + 1, mint::MOD - 1);
+    fact_inv[j] = fact[j].inv();
+    for (i64 i = j - 1; i >= 0; --i)
+        fact_inv[i] = fact_inv[i+1] * (i+1);
 
-        for (int i = inv.size(); i < 4*d + 2; ++i)
-            inv.emplace_back(fact[i-1] * fact_inv[i]);
+    vector<mint> inv(4*D + 2);
+    for (i64 i = 1; i < 4*D + 2; ++i)
+        inv[i] = fact[i-1] * fact_inv[i];
 
+    vector<mint> f(4*D + 2);
+    f[0] = 1; f[1] = 2;
+
+    for (i64 d = 1; d < D; d <<= 1) {
         vector<mint> g(d + 1);
-        for (int i = 0; i <= d; ++i) {
+        for (i64 i = 0; i <= d; ++i) {
             g[i] = f[i] * fact_inv[i] * fact_inv[d - i];
             if ((d ^ i) & 1) g[i] = -g[i];
         }
 
-        auto h = convolve(g, inv);
-        for (int i = 0; i <= d; ++i) h[i] = f[i];
-        for (int i = d + 1; i < 4*d + 2; ++i)
+        auto h = convolve(g, inv, 4*d + 2);
+        for (i64 i = 0; i <= d; ++i) h[i] = f[i];
+        for (i64 i = d + 1; i < 4*d + 2; ++i)
             h[i] *= fact[i] * fact_inv[i - d - 1];
 
-        f.resize(2*d + 1);
-        for (int i = 0; i <= 2*d; ++i)
+        for (i64 i = 0; i <= 2*d; ++i)
             f[i] = h[2*i] * h[2*i + 1];
     }
 
     mint ans(1);
-    int i = 0;
-    for (; (i + 1)*d <= N; ++i) ans *= f[i];
-    for (i = i*d + 1; i <= N; ++i) ans *= i;
-    cout << ans;
+    i64 i = 0;
+    for (; (i + 1)*D <= N; ++i) ans *= f[i];
+    for (i = i*D + 1; i <= N; ++i) ans *= i;
+    cout << ans.val;
+
     return 0;
 }
