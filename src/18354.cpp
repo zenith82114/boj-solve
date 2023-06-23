@@ -62,14 +62,19 @@ void fft(vector<cpx>& A, bool inv = false) {
         j ^= t;
         if (i < j) swap(A[i], A[j]);
     }
+
+    vector<cpx> roots(N>>1);
+    double theta = (inv? -2. : 2.) * PI / N;
+    for (int i = 0; i < N>>1; ++i) roots[i] = polar(1., i * theta);
+
     for (int n = 1; n < N; n <<= 1) {
-        double theta = (inv? -PI : PI) / n;
+        int step = (N>>1) / n;
         for (int m = 0; m < N; m += n<<1) {
             for (int i = 0, j = n; i < n; ++i, ++j) {
-                cpx a(A[m|i]);
-                cpx b(A[m|j] * polar(1., i * theta));
-                A[m|i] = a + b;
-                A[m|j] = a - b;
+                cpx a = A[m | i];
+                cpx b = A[m | j] * roots[i * step];
+                A[m | i] = a + b;
+                A[m | j] = a - b;
             }
         }
     }
