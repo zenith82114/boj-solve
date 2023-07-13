@@ -1,5 +1,5 @@
 /*
- * Q17439 - Alien trick + Monotone queue opt.
+ * Q17439 - Aliens trick + Monotone queue opt.
  * Date: 2023.2.18
  */
 

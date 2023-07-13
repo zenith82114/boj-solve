@@ -1,5 +1,5 @@
 /*
- * Q16191 - Alien trick
+ * Q16191 - Aliens trick
  * Date: 2023.2.17
  */
 
