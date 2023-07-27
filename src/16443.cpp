@@ -1,6 +1,6 @@
 /*
- * Q1542 - Sprague-Grundy theorem
- * Date: 2023.5.23
+ * Q16443 - Sprague-Grundy theorem
+ * Date: 2023.7.27
  */
 
 #include<bits/stdc++.h>
@@ -28,20 +28,17 @@ int main() {
     for (int y = 0; y <= 100; ++y)
         memo[x][y] = (!x || !y || x == y)? -2 : -1;
 
-    int TC = 5;
-    while (TC--) {
-        int N; cin >> N;
-        vector<ii> v(N);
-        for (auto& [x, y] : v) cin >> x >> y;
-        if (any_of(v.begin(), v.end(), [] (const ii& a) {
-            const auto& [x, y] = a; return !x || !y || x == y;
-        })) {
-            cout << "S\n";
-        } else {
-            int g = 0;
-            for (auto& [x, y] : v) g ^= grundy(x, y);
-            cout << (g? "S\n" : "D\n");
-        }
+    int N; cin >> N;
+    vector<ii> v(N);
+    for (auto& [x, y] : v) cin >> x >> y;
+    if (any_of(v.begin(), v.end(), [] (const ii& a) {
+        const auto& [x, y] = a; return !x || !y || x == y;
+    })) {
+        cout << 'Y';
+    } else {
+        int g = 0;
+        for (auto& [x, y] : v) g ^= grundy(x, y);
+        cout << (g? 'Y' : 'N');
     }
 
     return 0;
