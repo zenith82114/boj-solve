@@ -1,5 +1,5 @@
 /*
- * Q7040 - Bellman-Ford
+ * Q7040 - System of difference constraints
  * Date: 2023.1.20
  */
 
