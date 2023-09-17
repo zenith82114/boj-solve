@@ -16,8 +16,7 @@ inline i64 cx(const Line& a, const Line& b) {
 }
 
 int main() {
-    ios_base::sync_with_stdio(false);
-    cin.tie(nullptr); cout.tie(nullptr);
+    ios_base::sync_with_stdio(false); cin.tie(0);
 
     int N; cin >> N;
     i64 a, b, c; cin >> a >> b >> c;
@@ -25,7 +24,7 @@ int main() {
     for (i64& s : S) cin >> s;
     partial_sum(S.begin(), S.end(), S.begin());
 
-    int dp = a*S[0]*S[0] + b*S[0] + c;
+    i64 dp = a*S[0]*S[0] + b*S[0] + c;
     int sz = 1;
     deque<Line> hl;
     hl.emplace_back(0, 0);
