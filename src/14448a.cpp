@@ -1,48 +1,83 @@
 /*
- * Q14448a - DP
- * Date: 2023.6.21
+ * Q14448a - Simulated annealing
+ * Date: 2023.6.20
+ *
+ * [NOTE]
+ * The chance this code is accepted is pretty low,
+ * so one is advised to consult it only as reference.
  */
 
 #include<bits/stdc++.h>
 using namespace std;
 
-int A[50];
-int mem[50][50][50][50];
+mt19937 rng((unsigned)chrono::steady_clock::now().time_since_epoch().count());
 
-int dp(int l, int r, int x, int y) {
-    if (l > r || x > y) return 0;
-    if (l == r) return (x <= A[l] && A[l] <= y? 1 : 0);
-    if (mem[l][r][x][y] != -1) return mem[l][r][x][y];
+int rand_int(int a, int b) {
+    if (a == b) return a;
+    return uniform_int_distribution(a, b)(rng);
+}
+double rand_dbl(double a = 0., double b = 1.) {
+    return uniform_real_distribution(a, b)(rng);
+}
 
-    int& ans = mem[l][r][x][y];
-    // 1. not take A[l]
-    ans = max(ans, dp(l+1, r, x, y));
-    // 2. not take A[r]
-    ans = max(ans, dp(l, r-1, x, y));
-    // 3. take A[l]
-    if (x <= A[l] && A[l] <= y)
-        ans = max(ans, 1 + dp(l+1, r, A[l], y));
-    // 4. take A[r]
-    if (x <= A[r] && A[r] <= y)
-        ans = max(ans, 1 + dp(l, r-1, x, A[r]));
-    // 5. swap, then take both A[l] and A[r]
-    if (x <= A[r] && A[r] < A[l] && A[l] <= y)
-        ans = max(ans, 2 + dp(l+1, r-1, A[r], A[l]));
-    // 6. swap, then take only A[r] (old A[l])
-    if (x <= A[l] && A[l] <= y)
-        ans = max(ans, 1 + dp(l+1, r-1, x, A[l]));
-    // 7. swap, then take only A[l] (old A[r])
-    if (x <= A[r] && A[r] <= y)
-        ans = max(ans, 1 + dp(l+1, r-1, A[r], y));
-    return ans;
+int eval(vector<int>& arr, const bitset<50>& state) {
+    const int n = arr.size();
+    int i = 0, j = n-1;
+    while (i < j) {
+        while (i < j && !state[i]) i++;
+        while (i < j && !state[j]) j--;
+        if (i < j) swap(arr[i++], arr[j--]);
+    }
+    vector<int> dp;
+    for (int& x : arr) {
+        auto p = upper_bound(dp.begin(), dp.end(), x);
+        if (p == dp.end()) dp.emplace_back(x);
+        else *p = x;
+    }
+    i = 0, j = n-1;
+    while (i < j) {
+        while (i < j && !state[i]) i++;
+        while (i < j && !state[j]) j--;
+        if (i < j) swap(arr[i++], arr[j--]);
+    }
+    return dp.size();
 }
 
 int main() {
     ios_base::sync_with_stdio(false); cin.tie(0);
 
     int N; cin >> N;
-    for (int i = 0; i < N; ++i) { cin >> A[i]; A[i]--; }
-    memset(mem, -1, sizeof mem);
-    cout << dp(0, N-1, 0, 49);
+    if (N < 3) { cout << N; return 0; }
+    vector<int> arr(N); for (int& x : arr) cin >> x;
+
+    constexpr int    SHOTS = 10;
+    constexpr int    TIMEOUT = 100'000;
+    constexpr double INIT_TEMP = 10.;
+    constexpr double COOL_RATE = 0.9999;
+
+    int ans = 1;
+
+    for (int shot = 0; shot < SHOTS; ++shot) {
+        bitset<50> state;
+        for (int i = 0; i < N; ++i)
+            if (rand_dbl() < .5) state.set(i);
+        int score = eval(arr, state);
+        int max_score = score;
+        double temp = INIT_TEMP;
+
+        for (int clk = 0; clk < TIMEOUT; ++clk) {
+            auto nstate = state;
+            nstate.flip(rand_int(0, N-1));
+            int nscore = eval(arr, nstate);
+            if (rand_dbl() < exp((nscore - score) / temp)) {
+                state = nstate;
+                score = nscore;
+            }
+            max_score = max(max_score, score);
+            temp *= COOL_RATE;
+        }
+        ans = max(ans, max_score);
+    }
+    cout << ans;
     return 0;
 }
