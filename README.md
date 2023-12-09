@@ -1,7 +1,7 @@
 
 # boj-solve
 
-C++ solutions for BOJ problems
+C++ and Python solutions for BOJ problems
 
 ## Problem source
 
@@ -9,6 +9,7 @@ C++ solutions for BOJ problems
 
 ## Environment
 
-- Ubuntu 20.04.5 LTS
+- Ubuntu 20.04.6 LTS
 - g++ 11.1.0
 - std c++17
+- Python 3.8.10 64-bit

@@ -1,5 +1,6 @@
 .vscode/
 *.txt
-*.py
+/*.py
 *.sh
 src/[a-z]*
+src_py/[a-z]*
