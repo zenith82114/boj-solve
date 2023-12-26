@@ -1,86 +1,71 @@
 /*
  * Q19585 - Trie
- * Date: 2022.9.8
+ * Date: 2023.12.26
  */
 
 #include<bits/stdc++.h>
 using namespace std;
 
 class Trie {
-    bool eos = false;
-    map<char, Trie *> chld;
+    int chld[4'000'000][26];
+    bitset<4'000'000> eos;
+    int sz;
 public:
-    void insert(const string &s) {
-        Trie *curr = this;
-        for (const char &c : s) {
-            if (curr->chld.find(c) == curr->chld.end())
-                curr->chld[c] = new Trie;
-            curr = curr->chld[c];
-        }
-        curr->eos = true;
+    Trie(): sz(1) {
+        memset(chld[0], 0, 26 * sizeof(int));
     }
-    void insert_rev(const string &s) {
-        Trie *curr = this;
-        for (auto c = s.rbegin(); c != s.rend(); ++c) {
-            if (curr->chld.find(*c) == curr->chld.end())
-                curr->chld[*c] = new Trie;
-            curr = curr->chld[*c];
+    void insert(const string& s) {
+        int x = 0;
+        for (char c : s) {
+            int& y = chld[x][c - 'a'];
+            if (!y) {
+                y = sz++;
+                memset(chld[y], 0, 26 * sizeof(int));
+            }
+            x = y;
         }
-        curr->eos = true;
+        eos.set(x);
     }
-    void query(const string &s, vector<bool> &v) {
-        Trie *curr = this;
-        int sz = s.size();
-        fill(v.begin(), v.begin() + sz, false);
-        for (int i = 0; i < sz; ++i) {
-            if (curr->chld.find(s[i]) == curr->chld.end())
-                return;
-            curr = curr->chld[s[i]];
-            v[i] = curr->eos;
+    void query(const string& s, bitset<2'000>& v) {
+        int x = 0, i = 0;
+        for (char c : s) {
+            int y = chld[x][c - 'a'];
+            if (!y) break;
+            if (eos[y]) v.set(i++); else v.reset(i++);
+            x = y;
         }
+        int n = s.size();
+        for (; i < n; ++i) v[i] = false;
     }
-    void query_rev(const string &s, vector<bool> &v) {
-        Trie *curr = this;
-        int sz = s.size();
-        fill(v.begin(), v.begin() + sz, false);
-        for (int i = sz -1; ~i; --i) {
-            if (curr->chld.find(s[i]) == curr->chld.end())
-                return;
-            curr = curr->chld[s[i]];
-            v[i] = curr->eos;
-        }
-    }
-};
+} trie1, trie2;
 
 int main() {
-    ios_base::sync_with_stdio(false);
-    cin.tie(nullptr); cout.tie(nullptr);
-    constexpr int MAX_LEN = 2'000;
+    cin.tie(0)->sync_with_stdio(0);
 
     int C, N; cin >> C >> N;
     string s;
-    Trie trie1;
     while (C--) {
         cin >> s;
         trie1.insert(s);
     }
-    Trie trie2;
     while (N--) {
-        cin >> s;
-        trie2.insert_rev(s);
+        cin >> s; reverse(s.begin(), s.end());
+        trie2.insert(s);
     }
 
     int Q; cin >> Q;
-    vector<bool> v1(MAX_LEN), v2(MAX_LEN);
+    bitset<2'000> v1, v2;
     while (Q--) {
         cin >> s;
         trie1.query(s, v1);
-        trie2.query_rev(s, v2);
+        reverse(s.begin(), s.end());
+        trie2.query(s, v2);
 
         int sz = s.size();
         bool flag = false;
-        for (int i = 0; !flag && i +1 < sz; ++i)
-            flag = v1[i] && v2[i +1];
+        for (int i = 0; i+1 < sz; ++i) {
+            if (v1[i] && v2[sz-2-i]) { flag = true; break; }
+        }
         cout << (flag? "Yes\n" : "No\n");
     }
 
