@@ -1,5 +1,5 @@
 /*
- * Q1040 - Memoized DFS
+ * Q1040 - DP
  * Date: 2022.3.19
  */
 
@@ -11,24 +11,19 @@ int K, lN;
 bool memo[20][1<<10][2];
 
 bool dfs(int i, int k, int mask, bool tight) {
-    if (i == lN)
-        return k == K;
-    if (memo[i][mask][tight])
-        return false;
+    if (i == lN) return k == K;
+    if (memo[i][mask][tight]) return false;
+
     bool flag = false;
     for (char d = tight ? N[i] : '0'; d <= '9'; ++d) {
         int md = 1 << (d - '0');
-        if (!(mask & md)) {
-            if (k < K) {
-                flag = true;
-                mask |= md;
-                ++k;
-            }
-            else continue;
+        if (!(mask & md) && k < K) {
+            flag = true;
+            mask |= md;
+            ++k;
         }
         M[i] = d;
-        if (dfs(i +1, k, mask, tight && d == N[i]))
-            return true;
+        if (dfs(i+1, k, mask, tight && d == N[i])) return true;
         if (flag) {
             flag = false;
             mask ^= md;
@@ -41,8 +36,7 @@ bool dfs(int i, int k, int mask, bool tight) {
 }
 
 int main() {
-    ios_base::sync_with_stdio(false);
-    cin.tie(nullptr); cout.tie(nullptr);
+    cin.tie(0)->sync_with_stdio(0);
 
     cin >> N >> K;
     lN = N.size();
