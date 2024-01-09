@@ -1,101 +1,54 @@
 /*
- * Q14057 - Monotone stack + DP
- * Date: 2022.3.24
+ * Q14057 - Monotone stack + tree
+ * Date: 2024.1.9
  */
 
 #include<bits/stdc++.h>
 using namespace std;
 
-vector<int> hei_s;
-struct Item {
-    int val, idx;
-    Item(int v, int i) : val(v), idx(i) {}
-};
-stack<Item> stk;
+vector<vector<int> > chd;
+vector<int> par, hei;
 
-inline int htor(int h) {
-    auto p = lower_bound(hei_s.begin(), hei_s.end(), h);
-    return distance(hei_s.begin(), p);
-}
-inline int rtoh(int r) {
-    return hei_s[r];
+void dfs(int x) {
+    for (int y : chd[x]) {
+        dfs(y);
+        hei[x] = max(hei[x], hei[y]);
+    }
+    ++hei[x];
 }
 
 int main() {
-    ios_base::sync_with_stdio(false);
-    cin.tie(nullptr); cout.tie(nullptr);
+    cin.tie(0)->sync_with_stdio(0);
 
-    int N, K; cin >> N >> K;
-    vector<int> hei(N);
-    for (int& h : hei) cin >> h;
+    int n, k; cin >> n >> k;
+    vector<int> h(n); for (int& hi : h) cin >> hi;
+    auto sh(h);
+    sh.emplace_back(0);
+    sort(sh.begin(), sh.end());
 
-    hei_s = hei;
-    sort(hei_s.begin(), hei_s.end());
-    hei_s.erase(unique(hei_s.begin(), hei_s.end()), hei_s.end());
-
-    int M = hei_s.size();
-    vector<int> dp(M, 0);
-    vector<int> opt(M, -1);
-
-    int r1 = 0, r2 = 0;
-    int d;
-    for (int n = 0; n < N; ++n) {
-        d = 2;
-        while (!stk.empty() && stk.top().val <= hei[n]) {
-            stk.pop();
-            if (!stk.empty()) {
-                auto p2 = stk.top();
-                r2 = htor(p2.val);
-                if (dp[r2] <= dp[r1] + 1 && p2.idx < opt[r1]) {
-                    dp[r2] = dp[r1] + 1;
-                    opt[r2] = p2.idx;
-                }
-                if (dp[r2] < d) {
-                    dp[r2] = d;
-                    opt[r2] = p2.idx;
-                }
-                ++d;
-                r1 = r2;
-            }
+    chd.resize(n+1);
+    par.resize(n+1);
+    int cur = 0;
+    for (int hi : h) {
+        int x = lower_bound(sh.begin(), sh.end(), hi) - sh.begin();
+        while (0 < cur && cur < x) {
+            cur = par[cur];
         }
-        stk.emplace(hei[n], n);
-        r1 = htor(hei[n]);
-        if (dp[r1] <= 1) {
-            dp[r1] = 1;
-            opt[r1] = n;
+        chd[cur].emplace_back(x);
+        par[x] = cur;
+        cur = x;
+    }
+    hei.resize(n+1); dfs(0);
+    for (int x = 2; x <= n; ++x) hei[x] = max(hei[x], hei[x-1]);
+
+    while (k--) {
+        int t; cin >> t;
+        if (t < sh[1]) cout << "0 ";
+        else {
+            int x = lower_bound(sh.begin(), sh.end(), t) - sh.begin();
+            cout << hei[x-1] << ' ';
         }
     }
-    d = 2;
-    while (!stk.empty()) {
-        stk.pop();
-        if (!stk.empty()) {
-            auto p2 = stk.top();
-            r2 = htor(p2.val);
-            if (dp[r2] <= dp[r1] + 1 && p2.idx < opt[r1]) {
-                dp[r2] = dp[r1] + 1;
-                opt[r2] = p2.idx;
-            }
-            if (dp[r2] < d) {
-                dp[r2] = d;
-                opt[r2] = p2.idx;
-            }
-            ++d;
-            r1 = r2;
-        }
-    }
-    for (int i = 1; i < M; ++i)
-        dp[i] = max(dp[i], dp[i-1]);
-
-    while (K--) {
-        int h; cin >> h;
-        int r = htor(h);
-        if (r == M)
-            cout << dp[M-1] << ' ';
-        else if (rtoh(r) != h)
-            cout << (r ? dp[r-1] : 0) << ' ';
-        else cout << dp[r] << ' ';
-    }
-    cout << '\n';
 
     return 0;
 }
