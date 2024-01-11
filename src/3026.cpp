@@ -1,103 +1,78 @@
 /*
  * Q3026 - DP
- * Date: 2022.3.29
+ * Date: 2024.1.11
  */
 
 #include<bits/stdc++.h>
 using namespace std;
 using i64 = int64_t;
 
-i64 pw10[16];
-vector<int> memo[7];
-bitset<10> given(0);
-i64 X;
+i64 x;
+bool given[10];
+
+i64 ten[10][16];
+i64 memo[16][100'000];
 
 i64 dp(int n, i64 m) {
-    if (n < 7) {
-        if (m >= (i64)memo[n].size())
-            return 0;
-        if (memo[n][m] != -1)
-            return memo[n][m];
+    i64& ret = memo[n][m];
+    if (ret != -1) return ret;
+    if (!n) return ret = (m? 0 : 1);
+    ret = 0;
+    for (int d = 0; d < 10; ++d) if (given[d]) {
+        ret += dp(n-1, (m + x-ten[d][n-1]) % x);
     }
-    int k = n/2;
-    i64 M = memo[k].size();
-    i64 P = 0;
-    i64 p = pw10[n - k] % X;
-    i64 ret = 0;
-    for (i64 m1 = 0; m1 < M; ++m1) {
-        i64 tmp = dp(k, m1);
-        if (tmp) {
-            i64 m2 = (m + X - P) % X;
-            tmp *= dp(n - k, m2);
-            ret += tmp;
-        }
-        P = (P + p) % X;
-    }
-    if (n < 7)
-        memo[n][m] = ret;
     return ret;
 }
 
+i64 solve(i64 a) {
+    string sa = to_string(a);
+    int n = sa.size();
+    i64 ans = 0;
+    i64 mod = 0;
+    if (!given[0]) {
+        for (int i = 0; i < n; ++i) ans += dp(i, 0);
+    }
+    for (int i = 0; i < n; ++i) {
+        int ci = sa[i] - '0';
+        for (int d = 0; d < ci; ++d) if (given[d]) {
+            ans += dp(n-1-i, (x-mod + x-ten[d][n-1-i]) % x);
+        }
+        if (given[ci]) {
+            mod = (mod + ten[ci][n-1-i]) % x;
+        }
+        else return ans;
+    }
+    if (!mod) ++ans;
+    return ans;
+}
+
 int main() {
-    ios_base::sync_with_stdio(false);
-    cin.tie(nullptr); cout.tie(nullptr);
+    cin.tie(0)->sync_with_stdio(0);
 
-    string A, B, D;
-    cin >> X >> A >> B >> D;
+    i64 a, b; cin >> x >> a >> b;
+    string u; cin >> u;
+    for (char c : u) given[c - '0'] = true;
 
-    pw10[0] = 1;
-    for (int i = 1; i < 16; ++i)
-        pw10[i] = pw10[i-1] * 10;
-
-    memo[0].resize(1, 1);
-    memo[1].resize(min(10L, X), 0);
-    for (char& d : D) {
-        given[d-'0'] = true;
-        ++memo[1][(d-'0') % X];
-    }
-    for (int i = 2; i < 7; ++i)
-        memo[i].resize(min(pw10[i], X), -1);
-
-    int a = A.length(), b = B.length();
-    i64 cnt = 0, M = 0;
-    int i;
-    for (i = 0; i < a; ++i) {
-        for (char& d : D) if (d > A[i]) {
-            i64 m = (M + ((d-'0') * pw10[a-1-i])) % X;
-            cnt += dp(a-1-i, m ? X-m : 0);
+    if (x < 100'000) {
+        for (int d = 0; d < 10; ++d) {
+            ten[d][0] = d % x;
+            for (int i = 1; i < 16; ++i) ten[d][i] = (ten[d][i-1] * 10) % x;
         }
-        if (given[A[i]-'0'])
-            M = (M + ((A[i]-'0') * pw10[a-1-i])) % X;
-        else break;
-    }
-    if (i == a && M == 0) ++cnt;
-
-    M = 0;
-    for (i = 0; i < b; ++i) {
-        for (char& d : D) if (d < B[i]) {
-            i64 m = (M + ((d-'0') * pw10[b-1-i])) % X;
-            cnt += dp(b-1-i, m ? X-m : 0);
+        for (int i = 0; i < 16; ++i) {
+            memset(memo[i], -1, x * sizeof(i64));
         }
-        if (given[B[i]-'0'])
-            M = (M + ((B[i]-'0') * pw10[b-1-i])) % X;
-        else break;
-    }
-    if (i == b && M == 0) ++cnt;
-    if (given[0]) cnt -= dp(b-1, 0);
-
-    if (a < b) {
-        if (given[0])
-            cnt += dp(b-1, 0) - dp(a, 0);
-        else
-            for (i = a+1; i < b; ++i)
-                cnt += dp(i, 0);
-    }
-    else {
-        cnt -= dp(a, 0);
-        if (given[0])
-            cnt += dp(a-1, 0);
+        cout << solve(b) - solve(a-1);
+    } else {
+        auto chk = [] (i64 y) {
+            for (; y; y /= 10) if (!given[y%10]) return 0;
+            return 1;
+        };
+        i64 ans = 0;
+        for (i64 y = (a+x-1)/x*x; y <= b; y += x) {
+            ans += chk(y);
+        }
+        cout << ans;
     }
 
-    cout << cnt << '\n';
     return 0;
 }
