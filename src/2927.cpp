@@ -1,172 +1,152 @@
 /*
- * Q2927 - HLD + Union-find + BIT
- * Date: 2022.7.8
+ * Q2927 - HLD, disjoint sets, segment tree
+ * Date: 2024.1.13
  */
 
 #include<bits/stdc++.h>
 using namespace std;
 
 // HLD
-vector<vector<int>> adj;
-vector<int> hld_par, hld_sz,
-            ch_no, ch_dep, ch_idx, ch_len,
-            bit_idx;
-int hld_dfs1(int pu, int u) {
-    hld_par[u] = pu;
-    hld_sz[u]  = 1;
+array<vector<int>, 30001> adj;
+array<int,30001> dep, par, sz, ch_no, ch_dep, segt_idx;
+
+int dfs(int pu, int u) {
+    dep[u] = dep[pu] + 1;
+    par[u] = pu;
+    sz[u]  = 1;
     for (int& v : adj[u]) if (v != pu)
-        hld_sz[u] += hld_dfs1(u, v);
-    return hld_sz[u];
+        sz[u] += dfs(u, v);
+    return sz[u];
 }
-void hld_dfs2(int u, int cn, int cd, int& bi) {
-    ch_no[u]   = cn;
-    ch_dep[u]  = cd;
-    ch_idx[u]  = ch_len[cn]++;
-    bit_idx[u] = bi++;
+void hld(int u, int cn, int cd, int& si) {
+    ch_no[u]    = cn;
+    ch_dep[u]   = cd;
+    segt_idx[u] = si++;
 
     int hv = 0;
     for (int& v : adj[u])
-        if (v != hld_par[u] && (hld_sz[hv] < hld_sz[v]))
+        if (v != par[u] && (sz[hv] < sz[v]))
             hv = v;
     if (hv)
-        hld_dfs2(hv, cn, cd, bi);
+        hld(hv, cn, cd, si);
     for (int& v : adj[u])
-        if (v != hld_par[u] && v != hv)
-            hld_dfs2(v, v, cd+1, bi);
+        if (v != par[u] && v != hv)
+            hld(v, v, cd+1, si);
 }
 
-// Union-find
-vector<int> uf_arr;
-int find(int x) {
-    if (uf_arr[x] < 0)
-        return x;
-    return uf_arr[x] = find(uf_arr[x]);
-}
-bool connected(int x, int y) {
-    return find(x) == find(y);
-}
-bool link(int x, int y) {
-    x = find(x);
-    y = find(y);
-    if (x == y)
-        return false;
-    if (uf_arr[x] < uf_arr[y])
-        uf_arr[y] = x;
-    else {
-        if (uf_arr[x] == uf_arr[y])
-            uf_arr[y]--;
-        uf_arr[x] = y;
+// disjoint sets
+class disjoint_sets {
+    vector<int> ar;
+    int find(int x) {
+        return ar[x] < 0? x : ar[x] = find(ar[x]);
     }
-    return true;
-}
-
-// BIT
-class BIT {
-    int sz;
-    vector<int> tree;
-    int lsb(int n) { return n & -n; }
 public:
-    BIT(vector<int>& data) {
-        sz = data.size();
-        tree.resize(sz);
-        for (int i = 1; i < sz; ++i)
-            tree[bit_idx[i]] = data[i];
-        for (int i = 1; i < sz; ++i) {
-            int j = i + lsb(i);
-            if (j < sz)
-                tree[j] += tree[i];
+    disjoint_sets(int n): ar(n, -1) {}
+    void init() { fill(ar.begin(), ar.end(), -1); }
+    bool connected(int x, int y) {
+        return find(x) == find(y);
+    }
+    bool link(int x, int y) {
+        x = find(x);
+        y = find(y);
+        if (x == y) return false;
+        if (ar[x] < ar[y]) ar[y] = x;
+        else {
+            if (ar[x] == ar[y]) ar[y]--;
+            ar[x] = y;
         }
-    }
-    void update(int i, int v) {
-        int cur = query(i, i);
-        for (; i < sz; i += lsb(i))
-            tree[i] += (v - cur);
-    }
-    int query(int i, int j) {
-        int ret = 0;
-        i--;
-        for (; j > i; j -= lsb(j))
-            ret += tree[j];
-        for (; i > j; i -= lsb(i))
-            ret -= tree[i];
-        return ret;
+        return true;
     }
 };
 
+// segment tree
+class seg_tree {
+    vector<int> ar;
+    int n;
+public:
+    seg_tree(const vector<int>& cnt) {
+        int sz = cnt.size();
+        n = 1; while (n < sz) n <<= 1;
+        ar.resize(n<<1);
+        copy(cnt.begin(), cnt.end(), ar.begin() + n);
+        for (int i = n-1; i > 0; --i) ar[i] = ar[i<<1] + ar[i<<1|1];
+    }
+    void update(int i, int v) {
+        ar[i |= n] = v;
+        for (; i > 1; i >>= 1) ar[i>>1] = ar[i] + ar[i^1];
+    }
+    int query(int i, int j) {
+        int ans = 0;
+        for (i |= n, j |= n; i <= j; i >>= 1, j >>= 1) {
+            if ( i&1) ans += ar[i++];
+            if (~j&1) ans += ar[j--];
+        }
+        return ans;
+    }
+};
 
 int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr); cout.tie(nullptr);
 
     int N; cin >> N;
-    vector<int> data(N+1);
-    for (int n = 1; n <= N; ++n)
-        cin >> data[n];
-
-    adj.resize(N+1);
-    uf_arr.resize(N+1, -1);
+    vector<int> cnt(N+1);
+    for (int u = 1; u <= N; ++u) cin >> cnt[u];
 
     int M; cin >> M;
     struct query { int op, a, b; };
     vector<query> queries(M);
 
-    for (auto& q : queries) {
+    disjoint_sets dsu(N+1);
+    for (auto& [op, a, b] : queries) {
         string str;
-        cin >> str >> q.a >> q.b;
+        cin >> str >> a >> b;
         switch (str[0]) {
             case 'b':
-                q.op = 0;
-                if (link(q.a, q.b)) {
-                    adj[q.a].emplace_back(q.b);
-                    adj[q.b].emplace_back(q.a);
+                op = 0;
+                if (dsu.link(a, b)) {
+                    adj[a].emplace_back(b);
+                    adj[b].emplace_back(a);
                 }
                 break;
             case 'p':
-                q.op = 1;
+                op = 1;
                 break;
             case 'e':
-                q.op = 2;
+                op = 2;
         }
     }
 
-    hld_par.resize(N+1);
-    hld_sz .resize(N+1);
-    ch_no  .resize(N+1);
-    ch_dep .resize(N+1);
-    ch_idx .resize(N+1);
-    ch_len .resize(N+1);
-    bit_idx.resize(N+1);
+    dep[0] = 0;
+    sz.fill(0);
+    for (int u = 1; u <= N; ++u) if (!sz[u]) dfs(0, u);
+    ch_no.fill(0);
+    int si = 0;
+    for (int u = 1; u <= N; ++u) if (!ch_no[u]) hld(u, u, 0, si);
 
-    for (int u = 1; u <= N; ++u) if (!hld_sz[u])
-        hld_dfs1(0, u);
-    int bi = 1;
-    for (int u = 1; u <= N; ++u) if (!ch_no[u])
-        hld_dfs2(u, u, 0, bi);
+    vector<int> ncnt(N);
+    for (int u = 1; u <= N; ++u) ncnt[segt_idx[u]] = cnt[u];
+    seg_tree segt(ncnt);
+    dsu.init();
 
-    fill(uf_arr.begin(), uf_arr.end(), -1);
-    BIT bit(data);
-
-    for (const auto& q : queries) {
-        int a = q.a, b = q.b;
-        switch (q.op) {
+    for (auto& [op, a, b] : queries) {
+        switch (op) {
             case 0:
-                cout << (link(a, b) ? "yes\n" : "no\n");
+                cout << (dsu.link(a, b) ? "yes\n" : "no\n");
                 break;
             case 1:
-                bit.update(bit_idx[a], b);
+                segt.update(segt_idx[a], b);
                 break;
             case 2:
-                if (connected(a, b)) {
+                if (dsu.connected(a, b)) {
                     int ans = 0;
                     while (ch_no[a] != ch_no[b]) {
-                        if (ch_dep[a] > ch_dep[b])
-                            swap(a, b);
-                        ans += bit.query(bit_idx[ch_no[b]], bit_idx[b]);
-                        b = hld_par[ch_no[b]];
+                        if (ch_dep[a] > ch_dep[b]) swap(a, b);
+                        ans += segt.query(segt_idx[ch_no[b]], segt_idx[b]);
+                        b = par[ch_no[b]];
                     }
-                    if (ch_idx[a] > ch_idx[b])
-                        swap(a, b);
-                    ans += bit.query(bit_idx[a], bit_idx[b]);
+                    if (dep[a] > dep[b]) swap(a, b);
+                    ans += segt.query(segt_idx[a], segt_idx[b]);
                     cout << ans << '\n';
                 }
                 else cout << "impossible\n";
