@@ -1,57 +1,49 @@
 /*
- * Q7981 - Graph DP (Dijkstra's)
- * Date: 2022.10.5
+ * Q7981 - DP + Dijkstra's
+ * Date: 2024.1.22
  */
 
 #include<bits/stdc++.h>
 using namespace std;
-
 using i64 = int64_t;
 
-vector<vector<int> > adj, adj_rev;
-vector<i64> dp, dp_u;
+constexpr int MAXN = 200001;
+array<vector<int>, MAXN> adj, adj_rev;
+array<i64, MAXN> f, g;
 
 int main() {
-    ios_base::sync_with_stdio(false);
-    cin.tie(nullptr); cout.tie(nullptr);
+    cin.tie(0)->sync_with_stdio(0);
 
-    int N; cin >> N;
-    adj.resize(N+1);
-    adj_rev.resize(N+1);
-    dp_u.resize(N+1);
-    dp.resize(N+1);
-    for (int i = 1; i <= N; ++i) {
-        cin >> dp_u[i] >> dp[i];
+    int n; cin >> n;
+    for (int i = 1; i <= n; ++i) {
+        cin >> g[i] >> f[i];
         int r; cin >> r;
-        adj[i].resize(r);
-        for (int &j : adj[i]) {
-            cin >> j;
+        while (r--) {
+            int j; cin >> j;
+            adj[i].emplace_back(j);
             adj_rev[j].emplace_back(i);
         }
     }
-    for (int i = 1; i <= N; ++i)
-        for (const int &j : adj[i])
-            dp_u[i] += dp[j];
+    for (int i = 1; i <= n; ++i) {
+        for (int j : adj[i]) g[i] += f[j];
+    }
 
-    using pli = pair<i64, int>;
-    priority_queue<pli, vector<pli>, greater<pli> > pq;
-    for (int i = 1; i <= N; ++i)
-        if (dp_u[i] < dp[i])
-            pq.emplace(dp_u[i], i);
+    priority_queue<pair<i64, int> > pq;
+    for (int i = 1; i <= n; ++i) {
+        if (f[i] > g[i]) pq.emplace(-g[i], i);
+    }
 
     while (!pq.empty()) {
         int i = pq.top().second; pq.pop();
-        if (dp[i] > dp_u[i]) {
-            i64 x = dp[i] - dp_u[i];
-            dp[i] = dp_u[i];
-            for (const int &j : adj_rev[i]) {
-                dp_u[j] -= x;
-                if (dp[j] > dp_u[j])
-                    pq.emplace(dp_u[j], j);
+        if (f[i] > g[i]) {
+            i64 x = f[i] - g[i];
+            f[i] = g[i];
+            for (int j : adj_rev[i]) {
+                g[j] -= x;
+                if (f[j] > g[j]) pq.emplace(-g[j], j);
             }
         }
     }
-
-    cout << dp[1] << '\n';
+    cout << f[1];
     return 0;
 }
