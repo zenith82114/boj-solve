@@ -1,38 +1,52 @@
 /*
- * Q1129 - Greedy
- * Date: 2022.11.4
+ * Q1129 - DP + greedy
+ * Date: 2024.2.4
  */
 
 #include<bits/stdc++.h>
 using namespace std;
 
 int main() {
-    ios_base::sync_with_stdio(false);
-    cin.tie(nullptr); cout.tie(nullptr);
+    cin.tie(0)->sync_with_stdio(0);
 
-    int N; cin >> N;
-    vector<int> A(N);
-    for (int& a : A) cin >> a;
+    int x[64];
+    int dp[64][64];
 
-    sort(A.begin(), A.end());
-    int D = max(A[1] - A[0], A[N-1] - A[N-2]);
-    for (int i = 0; i+2 < N; ++i)
-        D = max(D, A[i+2] - A[i]);
+    int n; cin >> n;
+    for (int i = 1; i <= n; ++i) cin >> x[i];
+    sort(x+1, x+n+1);
 
-    vector<int> B1, B2;
-    int e = A[0];
-    for (const int& a : A) {
-        if (a - e > D) {
-            B2.emplace_back(B1.back());
-            B1.pop_back();
-            e = B2.back();
-        }
-        B1.emplace_back(a);
+    dp[2][3] = x[3] - x[1];
+    for (int j = 4; j <= n; ++j) {
+        dp[2][j] = max(dp[2][j-1], x[j] - x[j-1]);
     }
-    reverse(B2.begin(), B2.end());
+    for (int i = 3; i < n; ++i) {
+        dp[i][i+1] = INT32_MAX;
+        for (int k = 2; k < i; ++k) {
+            dp[i][i+1] = min(dp[i][i+1], max(dp[k][i], x[i+1] - x[k]));
+        }
+        for (int j = i+2; j <= n; ++j) {
+            dp[i][j] = max(dp[i][j-1], x[j] - x[j-1]);
+        }
+    }
 
-    for (const int& b : B1) cout << b << ' ';
-    for (const int& b : B2) cout << b << ' ';
+    int D = INT32_MAX;
+    for (int s = 2; s < n; ++s) {
+        D = min(D, max(dp[s][n], x[n] - x[s]));
+    }
 
+    vector<int> v1, v2;
+    int e = x[1];
+    for (int i = 1; i <= n; ++i) {
+        if (x[i] > e + D) {
+            v2.emplace_back(v1.back());
+            v1.pop_back();
+            e = v2.back();
+        }
+        v1.emplace_back(x[i]);
+    }
+    reverse(v2.begin(), v2.end());
+    for (int y : v1) cout << y << ' ';
+    for (int y : v2) cout << y << ' ';
     return 0;
 }
