@@ -30,7 +30,7 @@ int main() {
     while (M < N) {
         ty.fill(-1);
         S.fill(false), T.fill(false);
-        int x;
+        int x = -1;
         for (int i = 0; i < N; ++i)
             if (mx[i] < 0) {
                 x = i;
