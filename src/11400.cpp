@@ -1,45 +1,53 @@
 /*
- * Q11400 - Bridges
- * Date: 2023.8.22
+ * Q11400 - Bridges by DFS tree
+ * Date: 2024.3.2
+ *
+ * val[x] := # of back-edges going "over" edge (x, par[x]) in this direction
  */
 
 #include<bits/stdc++.h>
 using namespace std;
 
-vector<int> graph[100'001];
-int disc[100'001], early[100'001];
-vector<pair<int, int> > bridges;
-int clk = 0;
+array<vector<int>, 101010> graph;
+array<int, 101010> dep, par, val;
 
-void dfs(int pu, int u) {
-    disc[u] = early[u] = ++clk;
-    for (int& v : graph[u]) {
-        if (!disc[v]) {
-            dfs(u, v);
-            early[u] = min(early[u], early[v]);
-            if (disc[u] < early[v])
-                bridges.emplace_back(min(u, v), max(u, v));
+void dfs(int x) {
+    val[x] = 0;
+    for (int y : graph[x]) {
+        if (dep[y] == -1) {
+            dep[y] = dep[x] + 1;
+            par[y] = x;
+            dfs(y);
+            val[x] += val[y];
         }
-        else if (v != pu)
-            early[u] = min(early[u], disc[v]);
+        else if (dep[x] < dep[y]) --val[x];
+        else if (dep[x] > dep[y]) ++val[x];
     }
+    --val[x];
 }
 
 int main() {
-    ios_base::sync_with_stdio(false);
-    cin.tie(nullptr); cout.tie(nullptr);
+    cin.tie(0)->sync_with_stdio(0);
 
-    int V, E; cin >> V >> E;
-    while (E--) {
-        int u, v; cin >> u >> v;
-        graph[u].emplace_back(v);
-        graph[v].emplace_back(u);
+    int v, e; cin >> v >> e;
+    while (e--) {
+        int x, y; cin >> x >> y;
+        graph[x].emplace_back(y);
+        graph[y].emplace_back(x);
     }
 
-    for (int u = 1; u <= V; ++u) if (!disc[u]) dfs(0, u);
+    dep.fill(-1);
+    dep[1] = 0;
+    par[1] = -1;
+    dfs(1);
 
-    cout << bridges.size() << '\n';
-    sort(bridges.begin(), bridges.end());
-    for (const auto& [u, v] : bridges) cout << u << ' ' << v << '\n';
+    vector<pair<int, int> > ans;
+    for (int x = 2; x <= v; ++x) if (!val[x]) {
+        ans.emplace_back(min(x, par[x]), max(x, par[x]));
+    }
+    sort(ans.begin(), ans.end());
+    cout << ans.size() << '\n';
+    for (auto [x, y] : ans) cout << x<<' '<<y << '\n';
+
     return 0;
 }
