@@ -49,31 +49,26 @@ int main() {
         sort(v.begin(), v.end());
 
         vector<int> pos(n); iota(pos.begin(), pos.end(), 0);
-        const int nC2 = v.size();
         int ans_min = INT32_MAX, ans_max = 0;
 
-        for (int st = 0, en = 0; st < nC2; st = en) {
-            while (en < nC2 && v[st] == v[en]) ++en;
-            for (int id = st; id < en; ++id) {
-                int i = v[id].i, j = v[id].j;
-                swap(pos[i], pos[j]);
-                swap(pt[pos[i]], pt[pos[j]]);
+        for (const auto& [i, j, dx, dy] : v) {
+            swap(pos[i], pos[j]);
+            swap(pt[pos[i]], pt[pos[j]]);
 
-                int pi = pos[i], pj = pos[j];
-                if (pi > pj) swap(pi, pj);
-                int cp;
-                if (pi > 0) {
-                    cp = cross_prod(pt[pi], pt[pj], pt[pi-1]);
-                    ans_min = min(ans_min, cp);
-                    cp = cross_prod(pt[pi], pt[pj], pt[0]);
-                    ans_max = max(ans_max, cp);
-                }
-                if (pj < n-1) {
-                    cp = cross_prod(pt[pi], pt[pj], pt[pj+1]);
-                    ans_min = min(ans_min, cp);
-                    cp = cross_prod(pt[pi], pt[pj], pt[n-1]);
-                    ans_max = max(ans_max, cp);
-                }
+            int pi = pos[i], pj = pos[j];
+            if (pi > pj) swap(pi, pj);
+            int cp;
+            if (pi > 0) {
+                cp = cross_prod(pt[pi], pt[pj], pt[pi-1]);
+                ans_min = min(ans_min, cp);
+                cp = cross_prod(pt[pi], pt[pj], pt[0]);
+                ans_max = max(ans_max, cp);
+            }
+            if (pj < n-1) {
+                cp = cross_prod(pt[pi], pt[pj], pt[pj+1]);
+                ans_min = min(ans_min, cp);
+                cp = cross_prod(pt[pi], pt[pj], pt[n-1]);
+                ans_max = max(ans_max, cp);
             }
         }
         cout << (ans_min>>1)<<'.'<<(ans_min&1? 5 : 0) << ' ';
