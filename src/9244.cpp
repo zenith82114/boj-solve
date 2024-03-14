@@ -1,6 +1,6 @@
 /*
  * Q9244 - Line sweep + BBST
- * Date: 2024.3.2
+ * Date: 2024.3.14
  */
 
 #include<bits/stdc++.h>
@@ -42,7 +42,7 @@ int main() {
 
     for (int i = 0; i <= n; ++i) {
         auto& [l, r, id] = seg[i];
-        evt.emplace_back(l.x, 0, -l.y, i);
+        evt.emplace_back(l.x, 0, +l.y, i);
         evt.emplace_back(r.x, 1, -r.y, i);
     }
     sort(evt.begin(), evt.end());
@@ -51,11 +51,12 @@ int main() {
     set<segment> bbst;
     vector<set<segment>::iterator> iters(n+1);
 
-    for (const auto& [x, right, y_neg, id] : evt) {
+    for (auto& [x, right, y, id] : evt) {
+        if (right) y = -y;
         if (!right) {
             iters[id] = bbst.emplace(seg[id]).first;
         }
-        if (-y_neg == min(seg[id].l.y, seg[id].r.y)) {
+        if (y == min(seg[id].l.y, seg[id].r.y)) {
             if (iters[id] != bbst.begin()) {
                 succ[id] = prev(iters[id])->id;
             }
