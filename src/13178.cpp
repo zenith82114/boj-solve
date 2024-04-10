@@ -1,6 +1,6 @@
 /*
  * Q13178 - Bostan-Mori alg.
- * Date: 2022.12.18
+ * Date: 2024.4.10
  */
 
 #include<bits/stdc++.h>
@@ -124,22 +124,20 @@ int main() {
     int N; cin >> N;
     uint64_t M; cin >> M;
 
-    poly Q(N+1);
-    mint q_sum, x;
-    Q[0] = 1;
-    for (int i = N; i > 0; --i) {
+    poly Q(N+2);
+    mint isq;
+    for (int i = N+1; i > 1; --i) {
         cin >> Q[i];
-        q_sum += Q[i];
-        x += Q[i] * i;
+        isq += Q[i];
     }
-    for (int i = 1; i <= N; ++i) Q[i] = -Q[i] / q_sum;
-    x = q_sum / x;
+    isq = isq.inv();
+    Q[0] = 1;
+    Q[1] = (-Q[2])*isq - 1;
+    for (int i = 2; i <= N; ++i) Q[i] = (Q[i] - Q[i+1])*isq;
+    Q[N+1] *= isq;
 
-    poly P(N);
-    for (int i = 1; i < N; ++i) P[i] = P[i-1] - x;
-
-    poly_mul(P, Q);
-    trim(P, N);
+    poly P(N+1);
+    P[N] = 1;
 
     for (uint64_t e = M; e; e >>= 1) {
         poly Qm = Q;
@@ -156,6 +154,6 @@ int main() {
         Q.swap(Q_);
     }
 
-    cout << (P[0]/Q[0] + x * (uint)(M % MOD)) << '\n';
+    cout << (P[0]/Q[0]) << '\n';
     return 0;
 }
