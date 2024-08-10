@@ -1,6 +1,6 @@
 /*
- * Q11111 - MCMF w/ negative cost trick
- * Date: 2022.1.31
+ * Q11111 - MCMF
+ * Date: 2024.8.10
  */
 
 #include<bits/stdc++.h>
@@ -85,19 +85,20 @@ int main() {
                 if (n < N-1)
                     add_edge(v, v+M, -get_price(n, m, n+1, m));
             }
-            add_edge(v, T, 0);
+            else add_edge(v, T, 0);
         }
     }
 
-    int C = 0;
+    int ans = 0, cur = 0;
     while (spfa(S, T)) {
         for (int v = T; v != S; v = pred[v]) {
             cap[pred[v]][v] = false;
             cap[v][pred[v]] = true;
-            C += cost[pred[v]][v];
+            cur += cost[pred[v]][v];
         }
+        ans = min(ans, cur);
     }
 
-    cout << -C << '\n';
+    cout << -ans << '\n';
     return 0;
 }
