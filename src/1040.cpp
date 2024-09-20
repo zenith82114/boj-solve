@@ -17,10 +17,13 @@ bool dfs(int i, int k, int mask, bool tight) {
     bool flag = false;
     for (char d = tight ? N[i] : '0'; d <= '9'; ++d) {
         int md = 1 << (d - '0');
-        if (!(mask & md) && k < K) {
-            flag = true;
-            mask |= md;
-            ++k;
+        if (!(mask & md)) {
+            if (k < K) {
+                flag = true;
+                mask |= md;
+                ++k;
+            }
+            else continue;
         }
         M[i] = d;
         if (dfs(i+1, k, mask, tight && d == N[i])) return true;
