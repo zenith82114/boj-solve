@@ -1,11 +1,14 @@
 /*
  * Q20226 - Fast factorization + binary search
- * Date: 2023.12.17
+ * Date: 2024.12.9
  */
 
 #include<bits/stdc++.h>
 using namespace std;
 using u64 = uint64_t;
+
+default_random_engine rng;
+uniform_int_distribution<u64> dist;
 
 u64 mul_mod(u64 a, u64 b, u64 n) {
     u64 r = 0;
@@ -54,26 +57,32 @@ bool miller_rabin(u64 n) {
     return true;
 }
 
-inline u64 g(u64 x, u64 n) {
-    return (mul_mod(x, x, n) + 1) % n;
+inline u64 G(u64 x, u64 c, u64 n) {
+    return (mul_mod(x, x, n) + c) % n;
 }
 
 void factorize(u64 n, vector<u64>& v) {
+    while (~n & 1) {
+        n >>= 1;
+        v.emplace_back(2);
+    }
+    if (n == 1) return;
     if (miller_rabin(n)) {
         v.emplace_back(n);
         return;
     }
 
     u64 p = 1;
-    for (u64 i = 1; i <= n; ++i) {
-        u64 x = i, y = i;
-        p = 1;
+    while (p == 1) {
+        u64 x = dist(rng) % n;
+        u64 y = x;
+        u64 c = dist(rng) % n;
         while (p == 1) {
-            x = g(x, n);
-            y = g(g(y, n), n);
+            x = G(x, c, n);
+            y = G(G(y, c, n), c, n);
             p = gcd(n, x > y? x - y : y - x);
         }
-        if (p != n) break;
+        if (p == n) p = 1;
     }
 
     if (p != n) {

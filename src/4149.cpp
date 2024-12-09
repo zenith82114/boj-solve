@@ -1,11 +1,14 @@
 /*
  * Q4149 - Miller-Rabin primality test and Pollard's rho alg.
- * Date: 2023.3.8
+ * Date: 2024.12.9
  */
 
 #include<bits/stdc++.h>
 using namespace std;
 using u64 = uint64_t;
+
+default_random_engine rng;
+uniform_int_distribution<u64> dist;
 
 u64 mul_mod(u64 a, u64 b, u64 n) {
     u64 r = 0;
@@ -61,19 +64,21 @@ void factorize(u64 n, vector<u64>& v) {
         return;
     }
 
-    const auto G = [] (u64 x, u64 n) {
-        return (mul_mod(x, x, n) + 1) % n;
+    const auto G = [] (u64 x, u64 c, u64 n) {
+        return (mul_mod(x, x, n) + c) % n;
     };
+
     u64 p = 1;
-    for (u64 i = 1; i <= n; ++i) {
-        u64 x = i, y = i;
-        p = 1;
+    while (p == 1) {
+        u64 x = dist(rng) % n;
+        u64 y = x;
+        u64 c = dist(rng) % n;
         while (p == 1) {
-            x = G(x, n);
-            y = G(G(y, n), n);
+            x = G(x, c, n);
+            y = G(G(y, c, n), c, n);
             p = gcd(n, x > y? x - y : y - x);
         }
-        if (p != n) break;
+        if (p == n) p = 1;
     }
 
     if (p != n) {
@@ -93,8 +98,7 @@ void factorize(u64 n, vector<u64>& v) {
 }
 
 int main() {
-    ios_base::sync_with_stdio(false);
-    cin.tie(nullptr); cout.tie(nullptr);
+    cin.tie(0)->sync_with_stdio(0);
 
     u64 N; cin >> N;
     vector<u64> v;
