@@ -1,129 +1,106 @@
 /*
- * Q16357 - Sweeping + Lazy-prop segment tree
- * Date: 2022.2.11
+ * Q16357 - sweeping + lazy segment tree
+ * Date: 2025.1.4
  */
 
 #include<bits/stdc++.h>
 using namespace std;
 
-class seg_tree {
-    int N;
-    vector<int> A, lazy;
-
-    int lc(int n) { return n<<1; }
-    int rc(int n) { return n<<1 | 1; }
-    void add_util(int n, int l, int r, int i, int j, int x) {
-        int m = (l+r)/2;
-        if (lazy[n]) {
-            A[n] += lazy[n];
-            if (l != r) {
-                lazy[lc(n)] += lazy[n];
-                lazy[rc(n)] += lazy[n];
-            }
-            lazy[n] = 0;
-        }
-        if (l > j || r < i)
-            return;
-        if (l < i || r > j) {
-            add_util(lc(n), l, m, i, j, x);
-            add_util(rc(n), m+1, r, i, j, x);
-            A[n] = max(A[lc(n)], A[rc(n)]);
-        }
-        else {
-            A[n] += x;
-            if (l != r) {
-                lazy[lc(n)] += x;
-                lazy[rc(n)] += x;
-            }
-        }
+class LazySegTree {
+    int N, lgN;
+    vector<int> ar, lz;
+    void apply(int i, int x) {
+        ar[i] += x;
+        if (i < N) lz[i] += x;
     }
-    int query_util(int n, int l, int r, int i, int j) {
-        int m = (l+r)/2;
-        if (lazy[n]) {
-            A[n] += lazy[n];
-            if (l != r) {
-                lazy[lc(n)] += lazy[n];
-                lazy[rc(n)] += lazy[n];
-            }
-            lazy[n] = 0;
-        }
-        if (l > j || r < i)
-            return 0;
-        if (l < i || r > j)
-            return max(query_util(lc(n), l, m, i, j),
-            query_util(rc(n), m+1, r, i, j));
-        return A[n];
+    void push(int i) {
+        apply(i<<1, lz[i]);
+        apply(i<<1|1, lz[i]);
+        lz[i] = 0;
+    }
+    void pull(int i) {
+        ar[i] = max(ar[i<<1], ar[i<<1|1]);
     }
 public:
-    void init(int _N) {
-        N = _N;
-        int sz = 1;
-        while (sz < N) sz <<= 1;
-        A.assign(sz<<1, 0);
-        lazy.assign(A.size(), 0);
+    LazySegTree(int sz) {
+        for (N = 1, lgN = 0; N < sz; N <<= 1, ++lgN);
+        ar.resize(N<<1, 0);
+        for (int i = N-1; i; --i) ar[i] = ar[i<<1];
+        lz.resize(N, 0);
     }
     void add(int i, int j, int x) {
-        add_util(1, 0, N-1, i, j, x);
+        i |= N, j |= N;
+        for (int k = lgN; k; --k) {
+            if (    i>>k<<k !=   i) push(i>>k);
+            if ((j+1)>>k<<k != j+1) push(j>>k);
+        }
+        for (int l = i, r = j; l <= r; l >>= 1, r >>= 1) {
+            if ( l&1) apply(l++, x);
+            if (~r&1) apply(r--, x);
+        }
+        for (int k = 1; k <= lgN; ++k) {
+            if (    i>>k<<k != i  ) pull(i>>k);
+            if ((j+1)>>k<<k != j+1) pull(j>>k);
+        }
     }
     int query(int i, int j) {
-        return query_util(1, 0, N-1, i, j);
+        i |= N, j |= N;
+        for (int k = lgN; k; --k) {
+            if (    i>>k<<k !=   i) push(i>>k);
+            if ((j+1)>>k<<k != j+1) push(j>>k);
+        }
+        int ans = 0;
+        for (int l = i, r = j; l <= r; l >>= 1, r >>= 1) {
+            if ( l&1) ans = max(ans, ar[l++]);
+            if (~r&1) ans = max(ans, ar[r--]);
+        }
+        return ans;
     }
-} segt;
+};
+
+int memo[100005];
+vector<int> link[200005];
+int expire[200005] {};
 
 int main() {
-    ios_base::sync_with_stdio(false);
-    cin.tie(nullptr); cout.tie(nullptr);
+    cin.tie(0)->sync_with_stdio(0);
 
-    struct Ypoint {
-        int y, id;
-        Ypoint(int y, int id) : y(y), id(id) {}
-        bool operator<(const Ypoint& rhs) {
-            return y < rhs.y;
-        }
-    };
-    vector<Ypoint> Yv;
-
-    int N; cin >> N;
-    for (int i = 0; i < N; ++i) {
+    int n; cin >> n;
+    vector<pair<int, int> > v;
+    for (int i = 0; i < n; ++i) {
         int yh, yl;
         cin >> yh >> yh >> yl >> yl;
-        Yv.emplace_back(yl, i<<1);
-        Yv.emplace_back(yh, i<<1|1);
+        v.emplace_back(yl, i<<1);
+        v.emplace_back(yh, i<<1|1);
     }
-    sort(Yv.begin(), Yv.end());
+    sort(v.begin(), v.end());
 
-    vector<int> ylv(N<<1);
-    vector<vector<int>> yl_to_yh(N<<1);
-    vector<int> ends_at(N<<1|1, 0);
-    segt.init(N<<1);
-    int ny = -1;
-    int py = INT_MIN;
+    LazySegTree segt(2 * n);
 
-    for (auto& Y : Yv) {
-        if (py < Y.y) {
-            ny++;
-            py = Y.y;
+    int y_pred = INT_MIN;
+    int m = -1;
+
+    for (const auto& [y, id] : v) {
+        if (y_pred < y) { y_pred = y; ++m; }
+        if (id & 1) {
+            int yl = memo[id>>1];
+            link[yl].emplace_back(m);
+            ++expire[m + 1];
+            segt.add(yl, m, 1);
         }
-        if (Y.id & 1) {
-            int yl = ylv[Y.id>>1];
-            yl_to_yh[yl].emplace_back(ny);
-            ends_at[ny+1]++;
-            segt.add(yl, ny, 1);
-        }
-        else
-            ylv[Y.id>>1] = ny;
+        else memo[id>>1] = m;
     }
 
-    int res = 0, tmp = 0;
-    for (int yl = 0; yl < ny; ++yl) {
-        for (int& yh : yl_to_yh[yl]) {
-            tmp++;
-            segt.add(yl, yh, -1);
+    int ans = 0, cnt = 0;
+    for (int i = 0; i <= m; ++i) {
+        for (int j : link[i]) {
+            ++cnt;
+            segt.add(i, j, -1);
         }
-        tmp -= ends_at[yl];
-        res = max(res, tmp + segt.query(yl, ny));
+        cnt -= expire[i];
+        ans = max(ans, cnt + segt.query(i, m));
     }
 
-    cout << res << '\n';
+    cout << ans;
     return 0;
 }
