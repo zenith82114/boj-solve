@@ -1,88 +1,66 @@
 /*
- * Q8872 - Diameter and radius of tree
- * Date: 2022.12.29
+ * Q8872 - tree DP
+ * Date: 2025.1.15
  */
 
 #include<bits/stdc++.h>
 using namespace std;
 
-vector<vector<pair<int, int>>> forest;
-vector<bool> visited;
-vector<int> h, f;
+vector<pair<int, int> > adj[100000];
+bitset<100000> vis;
+array<int, 100000> f, h;
 
-pair<int, int> farthest(int pu, int u) {
-    int x = u;
+int dfs1(int px, int x) {
     int d = 0;
-    for (const auto& [v, w] : forest[u]) if (v != pu) {
-        auto [y, d1] = farthest(u, v);
-        if (d < w + d1) {
-            x = y;
-            d = w + d1;
-        }
+    h[x] = 0;
+    int h2x = 0;
+    for (const auto& [y, w] : adj[x]) if (y != px) {
+        d = max(d, dfs1(x, y));
+        int t = w + h[y];
+        if (h[x] <= t) { h2x = h[x]; h[x] = t; }
+        else h2x = max(h2x, t);
     }
-    return make_pair(x, d);
+    for (const auto& [y, w] : adj[x]) if (y != px) {
+        f[y] = w + (w + h[y] == h[x]? h2x : h[x]);
+    }
+    d = max(d, h[x] + h2x);
+    return d;
 }
 
-void dfs_hf(int pu, int u) {
-    visited[u] = true;
-    h[u] = 0;
-    int m1 = 0, m2 = 0;
-    for (const auto& [v, w] : forest[u]) if (v != pu) {
-        dfs_hf(u, v);
-        int m = w + h[v];
-        h[u] = max(h[u], m);
-        if (m >= m1) { m2 = m1; m1 = m; }
-        else if (m > m2) m2 = m;
-    }
-    for (const auto& [v, w] : forest[u]) if (v != pu)
-        f[v] = w + (w + h[v] == m1? m2 : m1);
-}
-
-int dfs_ge(int pu, int u, int gu, int eu) {
-    int r = eu;
-    for (const auto& [v, w] : forest[u]) if (v != pu) {
-        int gv = max(f[v], w + gu);
-        int ev = max(gv, h[v]);
-        r = min(r, dfs_ge(u, v, gv, ev));
+int dfs2(int px, int x) {
+    vis.set(x);
+    int r = max(f[x], h[x]);
+    for (const auto& [y, w] : adj[x]) if (y != px) {
+        f[y] = max(f[y], f[x] + w);
+        r = min(r, dfs2(x, y));
     }
     return r;
 }
 
 int main() {
-    ios_base::sync_with_stdio(false);
-    cin.tie(nullptr); cout.tie(nullptr);
+    cin.tie(0)->sync_with_stdio(0);
 
-    int N, M, L; cin >> N >> M >> L;
-    forest.resize(N);
-    while (M--) {
-        int u, v, w; cin >> u >> v >> w;
-        forest[u].emplace_back(v, w);
-        forest[v].emplace_back(u, w);
+    int n, m, L; cin >> n >> m >> L;
+    while (m--) {
+        int x, y, w; cin >> x >> y >> w;
+        adj[x].emplace_back(y, w);
+        adj[y].emplace_back(x, w);
     }
 
-    visited.resize(N, false);
-    h.resize(N);
-    f.resize(N);
     int d1 = 0;
     int r1 = -1, r2 = -1, r3 = -1;
-    for (int u = 0; u < N; ++u) if (!visited[u]) {
-        // diameter
-        auto p = farthest(-1, u);
-        auto q = farthest(-1, p.first);
-        d1 = max(d1, q.second);
-
-        // radius
-        dfs_hf(-1, u);
-        int r = dfs_ge(-1, u, 0, h[u]);
-        if (r >= r1) { r3 = r2; r2 = r1; r1 = r; }
-        else if (r >= r2) { r3 = r2; r2 = r; }
-        else if (r > r3) r3 = r;
+    for (int x = 0; x < n; ++x) if (!vis[x]) {
+        f[x] = 0;
+        d1 = max(d1, dfs1(-1, x));
+        int r = dfs2(-1, x);
+        if (r1 <= r) { r3 = r2; r2 = r1; r1 = r; }
+        else if (r2 <= r) { r3 = r2; r2 = r; }
+        else r3 = max(r3, r);
     }
 
     int ans = d1;
-    if (r2 != -1) ans = max(ans, r1 + r2 + L);
-    if (r3 != -1) ans = max(ans, r2 + r3 + L + L);
-    cout << ans << endl;
-
+    if (r2 > -1) ans = max(ans, r1 + r2 + L);
+    if (r3 > -1) ans = max(ans, r2 + r3 + L + L);
+    cout << ans;
     return 0;
 }
