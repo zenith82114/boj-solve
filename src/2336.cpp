@@ -1,59 +1,43 @@
 /*
- * Q2336 - Bottom-up segment tree
- * Date: 2022.5.24
+ * Q2336 - segment tree
+ * Date: 2025.1.27
  */
 
 #include<bits/stdc++.h>
 using namespace std;
 
-class seg_tree {
-    int N;
-    vector<int> A;
-public:
-    seg_tree(int sz) {
-        N = 1;
-        while (N < sz) N <<= 1;
-        A.resize(N<<1, INT_MAX);
+constexpr int TN = 1<<19, inf = 1e9;
+array<int, 2*TN> segt;
+
+void upd(int i, int x) {
+    for (segt[i |= TN] = x; i; i >>= 1) segt[i>>1] = min(segt[i], segt[i^1]);
+}
+
+int qry(int j) {
+    int i = TN; j |= TN;
+    int ans = inf;
+    for (; i <= j; i >>= 1, j >>= 1) {
+        if ( i & 1) ans = min(ans, segt[i++]);
+        if (~j & 1) ans = min(ans, segt[j--]);
     }
-    void insert(int x, int i) {
-        i += N;
-        for (A[i] = x; i > 1; i >>= 1)
-            A[i >> 1] = min(A[i], A[i^1]);
-    }
-    int query(int i, int j) {
-        int ret = INT_MAX;
-        for (i += N, j += N; i <= j; i >>= 1, j >>= 1) {
-            if (i & 1)
-                ret = min(ret, A[i++]);
-            if (!(j & 1))
-                ret = min(ret, A[j--]);
-        }
-        return ret;
-    }
-};
+    return ans;
+}
+
+array<int, TN> a, b;
 
 int main() {
-    ios_base::sync_with_stdio(false);
-    cin.tie(nullptr); cout.tie(nullptr);
+    cin.tie(0)->sync_with_stdio(0);
 
-    int N; cin >> N;
-    vector<int> stor1(N+1);
-    for (int i = 0; i < N; ++i) {
-        int s; cin >> s;
-        stor1[s] = i;
-    }
-    vector<int> stor2(N+1);
-    for (int i = 0; i < N; ++i) {
-        int s; cin >> s;
-        stor2[s] = i;
-    }
+    int n; cin >> n;
+    for (int i = 0; i < n; ++i) { int s; cin >> s; a[s] = i; }
+    for (int i = 0; i < n; ++i) { int s; cin >> s; b[s] = i; }
 
-    seg_tree segt(N);
+    segt.fill(inf);
     int cnt = 0;
-    while (N--) {
+    while (n--) {
         int s; cin >> s;
-        segt.insert(stor1[s], stor2[s]);
-        cnt += (segt.query(0, stor2[s]) == stor1[s]);
+        if (qry(a[s]) > b[s]) ++cnt;
+        upd(a[s], b[s]);
     }
 
     cout << cnt << '\n';
