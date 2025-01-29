@@ -1,5 +1,5 @@
 /*
- * Q11408 - MCMF
+ * Q11408 - min cost flow
  * Date: 2022.1.31
  */
 

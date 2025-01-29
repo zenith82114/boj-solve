@@ -1,5 +1,5 @@
 /*
- * Q11111 - MCMF
+ * Q11111 - min cost flow
  * Date: 2024.8.10
  */
 

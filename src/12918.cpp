@@ -1,5 +1,5 @@
 /*
- * Q12918 - Geometry + MCMF
+ * Q12918 - geometry, min cost flow
  * Date: 2023.6.6
  */
 
