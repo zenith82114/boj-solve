@@ -52,7 +52,7 @@ int main() {
         if (!isa[i])
             continue;
         j = sa[isa[i]-1];
-        while (S[i+k] == S[j+k])
+        while (i+k < N && j+k < N && S[i+k] == S[j+k])
             k++;
         lcp[isa[i]] = (k ? k-- : 0);
         ans -= lcp[isa[i]];

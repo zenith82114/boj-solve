@@ -52,7 +52,7 @@ int main() {
     vector<int> lcp(N);
     for (int k = 0, i = 0; i < N; ++i) if (isa[i]) {
         int j = sa[isa[i]-1];
-        while (S[i+k] == S[j+k]) ++k;
+        while (i+k < N && j+k < N && S[i+k] == S[j+k]) ++k;
         lcp[isa[i]] = k? k-- : 0;
     }
 
