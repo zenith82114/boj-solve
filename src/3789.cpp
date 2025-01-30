@@ -1,5 +1,5 @@
 /*
- * Q3789 - Lexicographically minimal string rotation; LCP array
+ * Q3789 - Lexicographically minimal string rotation; suffix array
  * Date: 2023.6.12
  */
 
