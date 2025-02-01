@@ -1,6 +1,6 @@
 /*
  * Q9244 - Line sweep + BBST
- * Date: 2024.3.14
+ * Date: 2025.2.1
  */
 
 #include<bits/stdc++.h>
@@ -16,7 +16,7 @@ struct segment {
     }
     bool operator<(const segment& oth) const {
         i64 X = max(l.x, oth.l.x);
-        return eval(X) < oth.eval(X);
+        return make_pair(eval(X), id) < make_pair(oth.eval(X), oth.id);
     }
 };
 
