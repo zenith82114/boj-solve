@@ -1,80 +1,32 @@
 /*
- * Q17411 - Segment tree
- * Date: 2023.3.2
+ * Q17411 - O(n log n) LIS
+ * Date: 2025.2.20
  */
 
 #include<bits/stdc++.h>
 using namespace std;
-using ii = pair<int, int>;
+constexpr int MAXN = 1e6 + 4, MOD = 1e9 + 7, INF = 1e9 + 1;
 
-class SegTree {
-    static const int MOD = 1e9 +7;
-    int N;
-    vector<ii> arr;
-public:
-    SegTree(int sz) {
-        for (N = 1; N < sz; N <<= 1);
-        arr.resize(N<<1);
-    }
-    ii query(int j) {
-        ii ans = {0, 0};
-        int i = N; j |= N;
-        for (; i <= j; i >>= 1, j >>= 1) {
-            if (i&1) {
-                if (ans.first < arr[i].first)
-                    ans = arr[i];
-                else if (ans.first == arr[i].first)
-                    ans.second = (ans.second + arr[i].second) % MOD;
-                i++;
-            }
-            if (~j&1) {
-                if (ans.first < arr[j].first)
-                    ans = arr[j];
-                else if (ans.first == arr[j].first)
-                    ans.second = (ans.second + arr[j].second) % MOD;
-                j--;
-            }
-        }
-        return ans;
-    }
-    void update(int i, ii& x) {
-        i |= N;
-        if (arr[i].first < x.first)
-            arr[i] = x;
-        else if (arr[i].first == x.first)
-            arr[i].second = (arr[i].second + x.second) % MOD;
-        for (; i > 1; i >>= 1) {
-            if (arr[i].first != arr[i^1].first)
-                arr[i>>1] = max(arr[i], arr[i^1]);
-            else
-                arr[i>>1] = {arr[i].first, (arr[i].second + arr[i^1].second) % MOD};
-        }
-    }
-};
+int a[MAXN];
+vector<pair<int, int> > v[MAXN];
 
 int main() {
-    ios_base::sync_with_stdio(false);
-    cin.tie(nullptr); cout.tie(nullptr);
+    cin.tie(0)->sync_with_stdio(0);
 
-    int N; cin >> N;
-    vector<int> A(N);
-    for (int& a : A) cin >> a;
-
-    A.emplace_back(INT_MIN);
-    vector<int> sortA(A);
-    sort(sortA.begin(), sortA.end());
-    A.pop_back();
-
-    SegTree segt(N+1);
-    for (const int& a : A) {
-        int i = lower_bound(sortA.begin(), sortA.end(), a) - sortA.begin();
-        auto x = segt.query(i-1);
-        if (!x.first) x.second = 1;
-        x.first++;
-        segt.update(i, x);
+    v[0].emplace_back(INF, 0);
+    v[0].emplace_back(-INF, 1);
+    int m = 0;
+    int n; cin >> n;
+    while (n--) {
+        int x; cin >> x;
+        int p = lower_bound(a, a + m, x) - a;
+        if (p == m) v[++m].emplace_back(INF, 0);
+        a[p] = x;
+        auto lb = lower_bound(v[p].rbegin(), v[p].rend(), make_pair(x, 0));
+        int cnt = (v[p].back().second - lb->second + MOD) % MOD;
+        v[p + 1].emplace_back(x, (v[p + 1].back().second + cnt) % MOD);
     }
 
-    auto x = segt.query(N);
-    cout << x.first << ' ' << x.second;
+    cout << m << ' ' << v[m].back().second;
     return 0;
 }
