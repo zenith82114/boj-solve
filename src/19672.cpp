@@ -1,6 +1,6 @@
 /*
  * Q19672 - Aliens trick
- * Date: 2023.7.13
+ * Date: 2025.4.12
  */
 
 #include<bits/stdc++.h>
@@ -27,7 +27,7 @@ pair<i64, i64> eval(i64 lmd) {
 }
 
 int main() {
-    ios_base::sync_with_stdio(false); cin.tie(0);
+    cin.tie(0)->sync_with_stdio(0);
 
     cin >> N >> K;
     for (int i = 1; i <= N; ++i) {
@@ -35,10 +35,9 @@ int main() {
     }
 
     i64 lo = 0, hi = 1e16;
-    while (lo < hi) {
+    while (lo + 1 < hi) {
         i64 mid = (lo + hi)>>1;
-        auto [dp, cnt] = eval(mid);
-        if (cnt > K) lo = mid+1; else hi = mid;
+        (eval(mid).second >= K? lo : hi) = mid;
     }
     auto [dp, cnt] = eval(lo);
     cout << dp + lo * cnt;
