@@ -1,6 +1,6 @@
 /*
  * Q19672 - Aliens trick
- * Date: 2025.4.12
+ * Date: 2025.4.17
  */
 
 #include<bits/stdc++.h>
@@ -34,12 +34,12 @@ int main() {
         cin >> s[i]; s[i] += s[i-1];
     }
 
-    i64 lo = 0, hi = 1e16;
+    i64 lo = -1, hi = 1e16;
     while (lo + 1 < hi) {
         i64 mid = (lo + hi)>>1;
-        (eval(mid).second >= K? lo : hi) = mid;
+        (eval(mid).second > K? lo : hi) = mid;
     }
-    auto [dp, cnt] = eval(lo);
-    cout << dp + lo * cnt;
+    auto [dp, cnt] = eval(hi);
+    cout << dp + hi * K;
     return 0;
 }
