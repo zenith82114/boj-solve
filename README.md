@@ -156,7 +156,7 @@ $O(VE)$: [gina0605](https://gina65.tistory.com/23)
 
 $O((V+E) \log E)$: [koosaga](https://koosaga.com/265)
 
-  - [ ] BOJ 16127 미생물 키우기
+  - [x] BOJ 16127 미생물 키우기
   - [ ] BOJ 19264 Hung Fu
   - [ ] BOJ 9582 Dictionary
 
