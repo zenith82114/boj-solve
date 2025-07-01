@@ -1,6 +1,6 @@
 /*
- * Q1492 - Combinatorics + DP
- * Date: 2024.5.4
+ * Q25974 - combinatorics, DP
+ * Date: 2025.7.2
  */
 
 #include<bits/stdc++.h>
@@ -52,32 +52,29 @@ struct mint {
         return (*this) *= x.inv();
     }
 };
+mint s[1004], comb[1004][1004];
 
 int main() {
     cin.tie(0)->sync_with_stdio(0);
 
-    mint s[60], comb[60][60];
-    int n, k; cin >> n >> k;
+    int n, p; cin >> n >> p;
 
-    for (int i = 0; i <= k+1; ++i) {
+    for (int i = 0; i <= p + 1; ++i) {
         comb[i][0] = 1;
         for (int j = 1; j < i; ++j) {
-            comb[i][j] = comb[i-1][j-1] + comb[i-1][j];
+            comb[i][j] = comb[i - 1][j - 1] + comb[i - 1][j];
         }
         comb[i][i] = 1;
     }
 
-    mint p(1);
-
-    for (int j = 0; j <= k; ++j) {
-        p *= n+1;
-        s[j] = p - 1;
-        for (int i = 0; i < j; ++i) {
-            s[j] -= comb[j+1][i] * s[i];
-        }
-        s[j] /= j+1;
+    mint t(1);
+    for (int k = 0; k <= p; ++k) {
+        t *= n + 1;
+        s[k] = t - 1;
+        for (int i = 0; i < k; ++i) s[k] -= comb[k + 1][i] * s[i];
+        s[k] /= k + 1;
     }
 
-    cout << s[k];
+    cout << s[p];
     return 0;
 }
