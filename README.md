@@ -9,9 +9,9 @@ C++ and Python solutions for BOJ problems
 
 ## Environment
 
-- Ubuntu 20.04.6 LTS
-- g++ 9.4.0 with `-std=gnu++17`
-- Python 3.8.10 64-bit
+- Ubuntu 24.04.2 LTS
+- g++ 13.3.0 with `-std=gnu++17`
+- Python 3.12.3
 
 ## Checklist
 
