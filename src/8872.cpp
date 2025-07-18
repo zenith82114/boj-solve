@@ -1,5 +1,5 @@
 /*
- * Q8872 - tree DP
+ * Q8872 - tree diamater and radius
  * Date: 2025.1.15
  */
 
