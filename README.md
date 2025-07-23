@@ -244,12 +244,13 @@ $O((V+E) \log E)$: [koosaga](https://koosaga.com/265)
   - [x] BOJ 13428 배열의 합
   - [x] BOJ 14176 트리와 소수
 
-### Linear Recurrence
+### Linear Recurrence by Polynomials
 
 Kitamasa: [jhnah917](https://justicehui.github.io/hard-algorithm/2021/03/13/kitamasa/)
 
 Bostan-Mori: [myungwoo](https://blog.myungwoo.kr/149)
 
+  - [x] BOJ 15572 블록 4
   - [x] BOJ 13725 RNG
   - [x] BOJ 13178 목공
 
