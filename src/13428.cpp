@@ -11,8 +11,8 @@ constexpr int lgK = 3, K = 1<<lgK;
 constexpr int N = 2 * (1<<17) * K;
 
 constexpr int MOD = 469762049;
-constexpr int PRIM_ROOT = 2187;
-constexpr int PRIM_ROOT_IDX = 26;
+constexpr int BASE_ROOT = 2187;
+constexpr int BASE_ROOT_IDX = 26;
 
 struct mint {
     int val;
@@ -58,7 +58,7 @@ struct mint {
 
 int a[MAXD] {}, b[MAXD] {}, c[2 * MAXD] {};
 mint f[N] {}, g[N] {};
-array<mint, PRIM_ROOT_IDX + 1> roots, roots_inv;
+array<mint, BASE_ROOT_IDX + 1> roots, roots_inv;
 vector<int> va, vb;
 
 void ntt(mint A[], const bool inv = false) {
@@ -87,9 +87,9 @@ void ntt(mint A[], const bool inv = false) {
 int main() {
     cin.tie(0)->sync_with_stdio(0);
 
-    roots[PRIM_ROOT_IDX] = mint(PRIM_ROOT);
-    for (int i = PRIM_ROOT_IDX; i; --i) roots[i-1] = roots[i] * roots[i];
-    for (int i = 1; i <= PRIM_ROOT_IDX; ++i) roots_inv[i] = roots[i].inv();
+    roots[BASE_ROOT_IDX] = mint(BASE_ROOT);
+    for (int i = BASE_ROOT_IDX; i; --i) roots[i-1] = roots[i] * roots[i];
+    for (int i = 1; i <= BASE_ROOT_IDX; ++i) roots_inv[i] = roots[i].inv();
 
     int n; cin >> n;
     for (int i = 0; i < n; ++i) { int x; cin >> x; ++a[x]; }

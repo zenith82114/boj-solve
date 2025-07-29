@@ -7,8 +7,8 @@
 using namespace std;
 
 #define MOD 104857601
-#define PRIM_ROOT 39193363
-#define PRIM_ROOT_IDX 22
+#define BASE_ROOT 39193363
+#define BASE_ROOT_IDX 22
 
 struct mint {
     int val;
@@ -63,7 +63,7 @@ struct mint {
 };
 
 using poly = vector<mint>;
-array<mint, PRIM_ROOT_IDX + 1> roots, roots_inv;
+array<mint, BASE_ROOT_IDX + 1> roots, roots_inv;
 
 inline int ceil_pow2(int n) {
     if (n & (n-1)) {
@@ -186,10 +186,10 @@ int main() {
     cin.tie(nullptr); cout.tie(nullptr);
 
     // preprocess roots for NTT
-    roots[PRIM_ROOT_IDX] = mint(PRIM_ROOT);
-    for (int i = PRIM_ROOT_IDX; i; --i)
+    roots[BASE_ROOT_IDX] = mint(BASE_ROOT);
+    for (int i = BASE_ROOT_IDX; i; --i)
         roots[i-1] = roots[i] * roots[i];
-    for (int i = 1; i <= PRIM_ROOT_IDX; ++i)
+    for (int i = 1; i <= BASE_ROOT_IDX; ++i)
         roots_inv[i] = roots[i].inv();
 
     int k; cin >> k;

@@ -8,8 +8,8 @@ using namespace std;
 
 // Caution: 2*(MOD-1) > INT32_MAX
 constexpr uint MOD = 1092616193;
-constexpr  int PRIM_ROOT = 633127788;
-constexpr  int PRIM_ROOT_IDX = 21;
+constexpr  int BASE_ROOT = 633127788;
+constexpr  int BASE_ROOT_IDX = 21;
 
 struct mint {
     uint val;
@@ -55,7 +55,7 @@ struct mint {
 
 using poly = vector<mint>;
 
-array<mint, PRIM_ROOT_IDX + 1> roots, roots_inv;
+array<mint, BASE_ROOT_IDX + 1> roots, roots_inv;
 
 void ntt(poly& A, const bool inv) {
     int N = A.size();
@@ -115,10 +115,10 @@ int main() {
     cin.tie(0)->sync_with_stdio(0);
 
     // preprocess for NTT
-    roots[PRIM_ROOT_IDX] = mint(PRIM_ROOT);
-    for (int i = PRIM_ROOT_IDX; i; --i)
+    roots[BASE_ROOT_IDX] = mint(BASE_ROOT);
+    for (int i = BASE_ROOT_IDX; i; --i)
         roots[i-1] = roots[i] * roots[i];
-    for (int i = 1; i <= PRIM_ROOT_IDX; ++i)
+    for (int i = 1; i <= BASE_ROOT_IDX; ++i)
         roots_inv[i] = roots[i].inv();
 
     int N; cin >> N;

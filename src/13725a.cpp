@@ -55,9 +55,9 @@ struct mint {
 
 using poly = vector<mint>;
 
-constexpr int PRIM_ROOT = 39193363;
-constexpr int PRIM_ROOT_IDX = 22;
-array<mint, PRIM_ROOT_IDX + 1> roots, roots_inv;
+constexpr int BASE_ROOT = 39193363;
+constexpr int BASE_ROOT_IDX = 22;
+array<mint, BASE_ROOT_IDX + 1> roots, roots_inv;
 
 void ntt(poly& A, const bool inv) {
     int N = A.size();
@@ -118,10 +118,10 @@ int main() {
     cin.tie(nullptr); cout.tie(nullptr);
 
     // preprocess for NTT
-    roots[PRIM_ROOT_IDX] = mint(PRIM_ROOT);
-    for (int i = PRIM_ROOT_IDX; i; --i)
+    roots[BASE_ROOT_IDX] = mint(BASE_ROOT);
+    for (int i = BASE_ROOT_IDX; i; --i)
         roots[i-1] = roots[i] * roots[i];
-    for (int i = 1; i <= PRIM_ROOT_IDX; ++i)
+    for (int i = 1; i <= BASE_ROOT_IDX; ++i)
         roots_inv[i] = roots[i].inv();
 
     int K; cin >> K;
