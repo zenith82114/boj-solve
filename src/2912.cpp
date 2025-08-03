@@ -1,96 +1,60 @@
 /*
- * Q2912 - Ad-hoc query w/ segment tree
- * Date: 2022.7.7
+ * Q2912 - segment tree, binary search
+ * Date: 2025.8.3
  */
 
 #include<bits/stdc++.h>
 using namespace std;
+using i64 = int64_t;
 
-vector<vector<int>> color_groups;
-inline int get_color_cnt(int i, int j, int c) {
-    auto& group = color_groups[c];
-    return upper_bound(group.begin(), group.end(), j)
-         - lower_bound(group.begin(), group.end(), i);
+struct node { int val = 0, cnt = 0; } segt[1<<20];
+
+node merge(const node& l, const node& r) {
+    if (l.val == r.val) return { l.val, l.cnt + r.cnt };
+    return { (l.cnt > r.cnt? l : r).val, abs(l.cnt - r.cnt) };
 }
 
-class seg_tree {
-    int N;
-    vector<int> tree;
-    int lc(int n) { return n<<1; }
-    int rc(int n) { return (n<<1)|1; }
-    void init_util(int n, int s, int e, vector<int>& data) {
-        if (s != e) {
-            int m = (s+e)>>1;
-            init_util(lc(n), s, m, data);
-            init_util(rc(n), m+1, e, data);
+vector<int> grp[10004];
 
-            if ((e-s+1)/2 < get_color_cnt(s, e, tree[lc(n)]))
-                tree[n] = tree[lc(n)];
-            else if ((e-s+1)/2 < get_color_cnt(s, e, tree[rc(n)]))
-                tree[n] = tree[rc(n)];
-            else tree[n] = 0;
-        }
-        else tree[n] = data[s];
-    }
-    void query_util(int n, int s, int e, int i, int j, vector<int>& ans) {
-        if (s > j || e < i)
-            return;
-        if (s < i || e > j) {
-            int m = (s+e)>>1;
-            query_util(lc(n), s, m, i, j, ans);
-            query_util(rc(n), m+1, e, i, j, ans);
-        }
-        else if (tree[n])
-            ans.emplace_back(tree[n]);
-    }
-public:
-    seg_tree(vector<int>& data) {
-        N = data.size()-1;
-        int sz = N;
-        if (sz & (sz-1)) {
-            for (int i = 1; i < 32; i <<= 1)
-                sz |= (sz >> i);
-            sz++;
-        }
-        tree.resize(sz<<1);
-        init_util(1, 1, N, data);
-    }
-    void query(int i, int j, vector<int>& ans) {
-        query_util(1, 1, N, i, j, ans);
-    }
-};
+int range_cnt(int i, int j, int v) {
+    const auto& g = grp[v];
+    return upper_bound(g.begin(), g.end(), j)
+         - lower_bound(g.begin(), g.end(), i);
+}
 
 int main() {
-    ios_base::sync_with_stdio(false);
-    cin.tie(nullptr); cout.tie(nullptr);
+    cin.tie(0)->sync_with_stdio(0);
 
-    int N, C; cin >> N >> C;
-    vector<int> data(N+1);
-    color_groups.resize(C+1);
-    for (int n = 1; n <= N; n++) {
-        cin >> data[n];
-        color_groups[data[n]].emplace_back(n);
+    int n, _; cin >> n >> _;
+    int tn = 1; while (tn <= n) tn *= 2;
+    for (int i = 1; i <= n; ++i) {
+        int v; cin >> v;
+        segt[tn|i] = { v, 1 };
+        grp[v].emplace_back(i);
     }
-    for (auto& group : color_groups)
-        sort(group.begin(), group.end());
+    for (int i = tn - 1; i; --i) segt[i] = merge(segt[i<<1], segt[i<<1|1]);
 
-    int M; cin >> M;
-    seg_tree segt(data);
-    vector<int> colors;
-    while (M--) {
-        int i, j; cin >> i >> j;
-        int x = 0;
-        colors.clear();
-
-        segt.query(i, j, colors);
-        for (int& c : colors) {
-            if ((j-i+1)/2 < get_color_cnt(i, j, c)) {
-                x = c;
-                break;
+    int q; cin >> q;
+    while (q--) {
+        int a, b; cin >> a >> b;
+        int ans = 0;
+        for (int i = tn|a, j = tn|b; i <= j; i /= 2, j /= 2) {
+            if (i&1) {
+                if (range_cnt(a, b, segt[i].val)*2 > b - a + 1) {
+                    ans = segt[i].val;
+                    break;
+                }
+                ++i;
+            }
+            if (~j&1) {
+                if (range_cnt(a, b, segt[j].val)*2 > b - a + 1) {
+                    ans = segt[j].val;
+                    break;
+                }
+                --j;
             }
         }
-        if (x)
-            cout << "yes " << x << '\n';
+        if (ans) cout << "yes " << ans << '\n';
         else cout << "no\n";
     }
 
