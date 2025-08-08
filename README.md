@@ -519,3 +519,9 @@ Polynomial Division: [hyperbolic](https://hyperbolic.tistory.com/4) / [cubelover
   - [x] BOJ 1626 두 번째로 작은 스패닝 트리
   - [x] BOJ 10637 Minimum Spanning Tree
   - [x] BOJ 10169 안전한 비상연락망
+
+### Connected Component DP
+
+  - [x] BOJ 21213 Mentors
+  - [x] BOJ 13188 Kangaroo
+  - [x] BOJ 16781 Skyscraper
