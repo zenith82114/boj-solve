@@ -336,7 +336,7 @@ Polynomial Division: [hyperbolic](https://hyperbolic.tistory.com/4) / [cubelover
 
 [jhnah917](https://github.com/justiceHui/SSU-SCCC-Study/blob/master/2022-winter-adv/slide/01.pdf)
 
-  - [ ] BOJ 12857 홍준이는 문자열을 좋아해
+  - [x] BOJ 12857 홍준이는 문자열을 좋아해
   - [ ] BOJ 25952 Rectangles
   - [ ] BOJ 22316 Regions
   - [ ] BOJ 25504 최적 경로와 쿼리
