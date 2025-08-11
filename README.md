@@ -332,7 +332,7 @@ Polynomial Division: [hyperbolic](https://hyperbolic.tistory.com/4) / [cubelover
   - [ ] BOJ 17674 특별관광도시
   - [ ] BOJ 18477 Jiry Matchings
 
-### Regions Trick (Query Caching)
+### Regions Trick (Sqrt Decomposition + Deduplication)
 
 [jhnah917](https://github.com/justiceHui/SSU-SCCC-Study/blob/master/2022-winter-adv/slide/01.pdf)
 

@@ -1,5 +1,5 @@
 /*
- * Q12857 - query caching
+ * Q12857 - Regions trick
  * Date: 2025.8.9
  */
 
@@ -8,7 +8,7 @@ using namespace std;
 using i64 = int64_t;
 
 vector<int> pos[600'000];
-map<i64, int> cache;
+map<pair<int, int>, int> cache;
 
 int Hash(const string& a) {
     int x = 0;
@@ -30,7 +30,7 @@ int main() {
         int Ha = Hash(a), Hb = Hash(b);
         if (pos[Ha].size() > pos[Hb].size()) swap(a, b), swap(Ha, Hb);
 
-        i64 key = (i64)Ha<<32|Hb;
+        auto key = make_pair(Ha, Hb);
         if (cache.find(key) == end(cache)) {
             int ans = L + 1;
             const auto& pa = pos[Ha], & pb = pos[Hb];
