@@ -339,7 +339,7 @@ Polynomial Division: [hyperbolic](https://hyperbolic.tistory.com/4) / [cubelover
   - [x] BOJ 12857 홍준이는 문자열을 좋아해
   - [x] BOJ 25952 Rectangles
   - [ ] BOJ 22316 Regions
-  - [ ] BOJ 25504 최적 경로와 쿼리
+  - [x] BOJ 25504 최적 경로와 쿼리
   - [ ] BOJ 25505 공통 부분 문자열 쿼리
 
 ### Bulldozer Trick
