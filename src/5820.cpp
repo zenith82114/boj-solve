@@ -1,88 +1,78 @@
 /*
- * Q5820 - Centroid DnC
- * Date: 2022.7.8
+ * Q5820 - centroid DnC
+ * Date: 2025.8.12
  */
 
 #include<bits/stdc++.h>
 using namespace std;
-constexpr int INF = INT_MAX>>1;
+constexpr int INF = 0x3f3f3f3f, MAXN = 200'000;
 
-struct Edge {
-    int v, d;
-    Edge(int v, int d): v(v), d(d) {}
-};
-vector<vector<Edge>> adj;
-vector<int> sz, min_dep, dirty;
-vector<bool> is_ct;
+vector<pair<int, int> > g[MAXN];
+int sz[MAXN], min_dep[1'000'004];
+vector<int> dirty;
+bool is_ct[MAXN] {};
 
-int dfs_sz(int pu, int u) {
-    sz[u] = 1;
-    for (const auto& [v, d] : adj[u])
-        if (v != pu && !is_ct[v])
-            sz[u] += dfs_sz(u, v);
-    return sz[u];
+int dfs_sz(int px, int x) {
+    sz[x] = 1;
+    for (auto [y, _] : g[x]) if (y != px && !is_ct[y]) {
+        sz[x] += dfs_sz(x, y);
+    }
+    return sz[x];
 }
-int ct(int pu, int u, int m) {
-    for (const auto& [v, d] : adj[u])
-        if (v != pu && !is_ct[v] && sz[v] > m)
-            return ct(u, v, m);
-    return u;
+int ct(int px, int x, int m) {
+    for (auto [y, _] : g[x]) if (y != px && !is_ct[y] && sz[y] > m) {
+        return ct(x, y, m);
+    }
+    return x;
 }
-int dfs_calc(int pu, int u, int K, int dep, int dist) {
+int dfs_calc(int px, int x, int K, int d, int k) {
     int ret = INF;
-    if (dist <= K) {
-        ret = min(ret, dep + min_dep[K - dist]);
-        for (const auto& [v, d] : adj[u])
-            if (v != pu && !is_ct[v])
-                ret = min(ret, dfs_calc(u, v, K, dep+1, dist + d));
+    if (k <= K) {
+        ret = min(ret, d + min_dep[K - k]);
+        for (auto [y, w] : g[x]) if (y != px && !is_ct[y]) {
+            ret = min(ret, dfs_calc(x, y, K, d + 1, k + w));
+        }
     }
     return ret;
 }
-void dfs_upd(int pu, int u, int K, int dep, int dist) {
-    if (dist <= K) {
-        min_dep[dist] = min(min_dep[dist], dep);
-        dirty.emplace_back(dist);
-        for (const auto& [v, d] : adj[u])
-            if (v != pu && !is_ct[v])
-                dfs_upd(u, v, K, dep+1, dist + d);
+void dfs_upd(int px, int x, int K, int d, int k) {
+    if (k <= K) {
+        min_dep[k] = min(min_dep[k], d);
+        dirty.emplace_back(k);
+        for (auto [y, w] : g[x]) if (y != px && !is_ct[y]) {
+            dfs_upd(x, y, K, d + 1, k + w);
+        }
     }
 }
-int ctd_dnc(int u, int K) {
-    int c = ct(-1, u, dfs_sz(-1, u)>>1);
+int ctd_dnc(int x, int K) {
+    int c = ct(-1, x, dfs_sz(-1, x) / 2);
     is_ct[c] = true;
 
-    for (const int& x : dirty) min_dep[x] = INF;
+    for (int x : dirty) min_dep[x] = INF;
     dirty.clear();
 
     int ret = INF;
-    for (const auto& [v, d] : adj[c]) if (!is_ct[v]) {
-        ret = min(ret, dfs_calc(c, v, K, 1, d));
-        dfs_upd(c, v, K, 1, d);
+    for (auto [y, w] : g[c]) if (!is_ct[y]) {
+        ret = min(ret, dfs_calc(c, y, K, 1, w));
+        dfs_upd(c, y, K, 1, w);
     }
-    for (const auto& [v, d] : adj[c]) if (!is_ct[v])
-        ret = min(ret, ctd_dnc(v, K));
-
+    for (auto [y, w] : g[c]) if (!is_ct[y]) ret = min(ret, ctd_dnc(y, K));
     return ret;
 }
 
 int main() {
-    ios_base::sync_with_stdio(false);
-    cin.tie(nullptr); cout.tie(nullptr);
+    cin.tie(0)->sync_with_stdio(0);
 
-    int N, K; cin >> N >> K;
-    adj.resize(N);
-    for (int n = 0; n < N-1; n++) {
-        int i, j, d; cin >> i >> j >> d;
-        adj[i].emplace_back(j, d);
-        adj[j].emplace_back(i, d);
+    int n, K; cin >> n >> K;
+    for (int i = 1; i < n; ++i) {
+        int x, y, w; cin >> x >> y >> w;
+        g[x].emplace_back(y, w);
+        g[y].emplace_back(x, w);
     }
 
-    sz.resize(N);
-    is_ct.resize(N, false);
-    min_dep.resize(K+1, INF);
+    memset(min_dep, INF, sizeof min_dep);
     min_dep[0] = 0;
     int ans = ctd_dnc(0, K);
-    cout << (ans != INF ? ans : -1) << '\n';
-
+    cout << (ans < INF ? ans : -1);
     return 0;
 }
