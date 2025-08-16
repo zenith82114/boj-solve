@@ -1,125 +1,91 @@
 /*
- * Q16911 - Offline dynamic connectivity
- * Date: 2022.2.23
+ * Q16911 - offline dynamic connectivity
+ * Date: 2025.8.16
  */
 
 #include<bits/stdc++.h>
 using namespace std;
-using pii = pair<int, int>;
+using i64 = int64_t;
+using ii = pair<int, int>;
 
-struct EdgeTime {
-    int u, v, ts, te;
-    EdgeTime(int u, int v, int ts, int te)
-    : u(u), v(v), ts(ts), te(te) {};
+struct Interval {
+    int x, y, s, e;
+    Interval(int x, int y, int s, int e): x(x), y(y), s(s), e(e) {};
 };
-vector<EdgeTime> edti;
-map<pii, int> mp;
-vector<pii> que;
+vector<Interval> intv;
+map<ii, int> mp;
+vector<ii> que, unions[1<<18];
+int dsu[100'004];
 
-// Union-find
-vector<int> par, rnk;
-int find(int x) {
-    while (x != par[x])
-        x = par[x];
-    return x;
+int _find(int x) { return dsu[x] < 0? x : _find(dsu[x]); }
+
+bool connected(int x, int y) { return _find(x) == _find(y); }
+
+ii unite(int x, int y) {
+    x = _find(x), y = _find(y);
+    if (x == y) return {-1, 0};
+    if (dsu[x] < dsu[y]) swap(x, y);
+    ii log(x, dsu[x]);
+    dsu[y] += dsu[x]; dsu[x] = y;
+    return log;
 }
-bool connected(int x, int y) {
-    return find(x) == find(y);
+
+void rollback(const ii& log) {
+    auto [x, v] = log;
+    if (x == -1) return;
+    int y = dsu[x];
+    dsu[y] -= (dsu[x] = v);
 }
-int link(int x, int y) {
-    int X = find(x), Y = find(y);
-    if (X == Y)
-        return 0;
-    if (rnk[X] < rnk[Y]) {
-        par[X] = Y;
-        return X;
-    }
+
+void add_util(int n, int ns, int ne, const Interval& t) {
+    if (t.e <= ns || ne <= t.s) return;
+    if (t.s <= ns && ne <= t.e) unions[n].emplace_back(t.x, t.y);
     else {
-        par[Y] = X;
-        if (rnk[X] == rnk[Y]) {
-            rnk[X]++;
-            return -Y;
-        }
-        return Y;
+        int mid = (ns + ne)/2;
+        add_util(n<<1, ns, mid, t);
+        add_util(n<<1|1, mid, ne, t);
     }
-}
-void rollback(int z) {
-    if (!z)
-        return;
-    if (z < 0) {
-        z = -z;
-        rnk[par[z]]--;
-    }
-    par[z] = z;
 }
 
-// DnC
-vector<vector<pii>> E;
-inline int lc(int n) { return n<<1; }
-inline int rc(int n) { return n<<1|1; }
-void add_util(int n, int l, int r, EdgeTime& e) {
-    int m = (l+r)>>1;
-    if (l > e.te || r < e.ts)
-        return;
-    if (l < e.ts || r > e.te) {
-        add_util(lc(n), l, m, e);
-        add_util(rc(n), m+1, r, e);
+void solve_util(int n, int ns, int ne) {
+    vector<ii> logs;
+    for (const auto& [x, y] : unions[n]) logs.emplace_back(unite(x, y));
+    if (ns + 1 == ne) {
+        auto [x, y] = que[ns];
+        cout << connected(x, y) << '\n';
+    } else {
+        int mid = (ns + ne)/2;
+        solve_util(n<<1, ns, mid);
+        solve_util(n<<1|1, mid, ne);
     }
-    else E[n].emplace_back(e.u, e.v);
-}
-void solve_util(int n, int l, int r) {
-    vector<int> log;
-    int m = (l+r)>>1;
-    for (pii& e : E[n])
-        log.emplace_back(link(e.first, e.second));
-    if (l != r) {
-        solve_util(lc(n), l, m);
-        solve_util(rc(n), m+1, r);
-    }
-    else cout << connected(que[l].first, que[l].second) << '\n';
-    for (auto rit = log.rbegin(); rit != log.rend(); ++rit)
-        rollback(*rit);
+    while (!logs.empty()) { rollback(logs.back()); logs.pop_back(); }
 }
 
 int main() {
-    ios_base::sync_with_stdio(false);
-    cin.tie(nullptr); cout.tie(nullptr);
+    cin.tie(0)->sync_with_stdio(0);
 
-    int N, M; cin >> N >> M;
-    int Q = 0;
-    while (M--) {
-        int t, u, v; cin >> t >> u >> v;
-        if (u > v)
-            swap(u, v);
-        if (t == 1)
-            mp[{u, v}] = Q;
+    int n, m; cin >> n >> m;
+    int q = 0;
+    while (m--) {
+        int t, x, y; cin >> t >> x >> y;
+        if (x > y) swap(x, y);
+        ii key(x, y);
+        if (t == 1) mp.emplace(key, q);
         else if (t == 2) {
-            if (mp[{u, v}] < Q)
-                edti.emplace_back(u, v, mp[{u, v}], Q-1);
-            mp.erase({u, v});
-        }
-        else {
-            que.emplace_back(u, v);
-            Q++;
+            if (mp[key] < q) intv.emplace_back(x, y, mp[key], q);
+            mp.erase(key);
+        } else {
+            que.emplace_back(x, y);
+            ++q;
         }
     }
-    for (const auto& [k, v] : mp)
-        edti.emplace_back(k.first, k.second, v, Q-1);
-
-    E.resize(2 * [](int n) {
-        if (n & (n-1)) {
-            for (int i = 1; i < 32; i <<= 1)
-                n |= (n>>i);
-            return n+1;
-        }
-        return n;
-    }(Q));
-    for (auto& e : edti)
-        add_util(1, 0, Q-1, e);
-
-    par.resize(N+1), rnk.resize(N+1, 0);
-    iota(par.begin(), par.end(), 0);
-    solve_util(1, 0, Q-1);
-
+    for (const auto& [key, v] : mp) {
+        auto [x, y] = key;
+        intv.emplace_back(x, y, v, q);
+    }
+    mp.clear();
+    for (const auto& t : intv) add_util(1, 0, q, t);
+    memset(dsu, -1, sizeof dsu);
+    solve_util(1, 0, q);
     return 0;
 }
