@@ -490,7 +490,6 @@ Polynomial Division: [hyperbolic](https://hyperbolic.tistory.com/4) / [cubelover
 
   - [x] BOJ 7812 중앙 트리
   - [x] BOJ 27730 견우와 직녀
-  - [ ] BOJ 22900 나의 라임 오렌지 나무
   - [ ] BOJ 14875 City Attractions
 
 ### Connection Profile DP
