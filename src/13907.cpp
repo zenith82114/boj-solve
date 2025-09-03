@@ -1,61 +1,44 @@
 /*
- * Q13907 - Graph DP
- * Date: 2022.8.31
+ * Q13907 - DP
+ * Date: 2025.9.3
  */
 
 #include<bits/stdc++.h>
 using namespace std;
+constexpr int inf = 0x3f3f3f3f;
+
+vector<tuple<int, int, int> > edg;
+vector<pair<int, int> > opt;
+int dp[2][1004] {};
 
 int main() {
-    ios_base::sync_with_stdio(false);
-    cin.tie(nullptr); cout.tie(nullptr);
-    constexpr int inf = INT_MAX;
+    cin.tie(0)->sync_with_stdio(0);
 
-    int N, M, K; cin >> N >> M >> K;
-    int S, D; cin >> S >> D;
-
-    vector<vector<pair<int, int> > > graph(N +1);
-    while (M--) {
-        int u, v, w; cin >> u >> v >> w;
-        graph[u].emplace_back(v, w);
-        graph[v].emplace_back(u, w);
+    int n, m, k; cin >> n >> m >> k;
+    int s, d; cin >> s >> d;
+    while (m--) {
+        int x, y, w; cin >> x >> y >> w;
+        edg.emplace_back(x, y, w);
+        edg.emplace_back(y, x, w);
     }
 
-    vector<int> dp0(N +1);
-    vector<int> dp1(N +1, inf);
-    dp1[S] = 0;
-    vector<bool> upd0(N +1);
-    vector<bool> upd1(N +1, false);
-    upd1[S] = true;
-
-    vector<pair<int, int> > opt;
-
-    for (int k = 1; k < N; ++k) {
-        copy(dp1.begin(), dp1.end(), dp0.begin());
-        upd0.swap(upd1);
-        fill(upd1.begin(), upd1.end(), false);
-        for (int u = 1; u <= N; ++u) if (upd0[u]) {
-            for (const auto &e : graph[u]) {
-                int v, w; tie(v, w) = e;
-                if (dp1[v] > dp0[u] + w) {
-                    dp1[v] = dp0[u] + w;
-                    upd1[v] = true;
-                }
-            }
+    memset(dp[1], inf, sizeof dp[0]);
+    dp[1][s] = 0;
+    for (int i = 1; i < n; ++i) {
+        memcpy(dp[0], dp[1], sizeof dp[0]);
+        for (const auto& [x, y, w] : edg) {
+            dp[1][y] = min(dp[1][y], dp[0][x] + w);
         }
-        if (dp0[D] > dp1[D])
-            opt.emplace_back(k, dp1[D]);
+        if (dp[0][d] > dp[1][d]) opt.emplace_back(dp[1][d], i);
     }
 
-    cout << opt.back().second << '\n';
-
-    int P = 0;
-    while (K--) {
+    cout << opt.back().first << '\n';
+    int p_acc = 0;
+    while (k--) {
         int p; cin >> p;
-        P += p;
+        p_acc += p;
         int ans = inf;
-        for (const auto &o : opt)
-            ans = min(ans, o.first * P + o.second);
+        for (const auto& [d0, i] : opt) ans = min(ans, d0 + i*p_acc);
         cout << ans << '\n';
     }
 
