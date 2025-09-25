@@ -1,73 +1,63 @@
 /*
- * Q2261 - Closest point pair by DnC
- * Date: 2021.7.11
+ * Q2261 - geometry, DnC
+ * Date: 2025.9.25
  */
 
-#include<iostream>
-#include<algorithm>
-#include<cmath>
-#include<vector>
+#include<bits/stdc++.h>
 using namespace std;
+using i64 = int64_t;
 
-struct Point { int x, y; };
+struct Vec2 { int x, y; } pt[100000];
+int y_ord[100000];
 
-uint64_t sqr_dist(Point &p, Point &q) {
-    return (uint64_t)(pow(p.x-q.x, 2) + pow(p.y-q.y, 2));
+int sqr_dist(int i, int j) {
+    int dx = pt[i].x - pt[j].x, dy = pt[i].y - pt[j].y;
+    return dx*dx + dy*dy;
 }
 
-uint64_t min_sqr_dist(vector<Point> &V, int l, int r) {
-    uint64_t d2 = UINT64_MAX;
-
-    if (r - l < 3) {
-        for (int i = l; i < r; ++i)
-            for (int j = i+1; j <= r; ++j)
-                d2 = min(d2, sqr_dist(V[i], V[j]));
-        return d2;
+int dnc(int s, int e) {
+    int ans = INT32_MAX;
+    if (e - s <= 3) {
+        for (int i = s; i < e; ++i)
+        for (int j = i + 1; j < e; ++j) ans = min(ans, sqr_dist(i, j));
+        return ans;
     }
 
-    int m = (l + r) / 2;
-    d2 = min(min_sqr_dist(V, l, m), min_sqr_dist(V, m+1, r));
-    if (!d2) return 0;
-
-    vector<Point> W;
-    int d = (int)ceil(sqrt(d2));
-    int t = V[m].x - d;
-    for (int i = m; i >= l; --i) {
-        if (V[i].x > t)
-            W.push_back(V[i]);
-        else break;
+    const int mid = (s + e) / 2;
+    vector<int> temp(y_ord + s, y_ord + e);
+    for (int i = s, j = mid, k = 0; k < e - s; ++k) {
+        y_ord[(temp[k] < mid? i : j)++] = temp[k];
     }
-    t = V[m].x + d;
-    for (int i = m+1; i <= r; ++i) {
-        if (V[i].x < t)
-            W.push_back(V[i]);
-        else break;
-    }
-    sort(W.begin(), W.end(),
-    [](const Point& p, const Point& q) { return p.y < q.y; });
+    ans = min(dnc(s, mid), dnc(mid, e));
+    const int delta = (int)ceil(sqrt(ans));
 
-    int K = W.size();
-    for (int i = 0; i < K; ++i) {
-        for (int j = i+1; j < K; ++j) {
-            if (W[j].y - W[i].y >= d)
-                break;
-            d2 = min(d2, sqr_dist(W[i], W[j]));
+    vector<int> temp2;
+    for (int i : temp) {
+        if (pt[mid].x - delta <= pt[i].x && pt[i].x <= pt[mid].x + delta) {
+            temp2.emplace_back(i);
         }
     }
-    return d2;
+    const int t = temp2.size();
+    for (int ii = 0; ii < t; ++ii) {
+        int i = temp2[ii];
+        for (int jj = ii + 1; jj < t; ++jj) {
+            int j = temp2[jj];
+            if (pt[i].y + delta <= pt[j].y) break;
+            ans = min(ans, sqr_dist(i, j));
+        }
+    }
+    return ans;
 }
 
 int main() {
-    ios_base::sync_with_stdio(false);
-    cin.tie(nullptr); cout.tie(nullptr);
+    cin.tie(0)->sync_with_stdio(0);
 
-    int N; cin >> N;
-    vector<Point> V(N);
-    for (auto& v : V) cin >> v.x >> v.y;
-    sort(V.begin(), V.end(),
-    [](const Point& p, const Point& q) { return p.x < q.x; });
+    int n; cin >> n;
+    for (int i = 0; i < n; ++i) cin >> pt[i].x >> pt[i].y;
+    sort(pt, pt + n, [] (const Vec2& a, const Vec2& b) { return a.x < b.x; });
+    iota(y_ord, y_ord + n, 0);
+    sort(y_ord, y_ord + n, [] (int i, int j) { return pt[i].y < pt[j].y; });
 
-    cout << min_sqr_dist(V, 0, N-1) << '\n';
-
+    cout << dnc(0, n);
     return 0;
 }
