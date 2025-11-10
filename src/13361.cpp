@@ -1,53 +1,55 @@
 /*
- * Q13361 - Ad-hoc; graph theory
- * Date: 2023.5.23
+ * Q13361 - ad-hoc; graph theory
+ * Date: 2025.11.10
  */
 
 #include<bits/stdc++.h>
 using namespace std;
+using i64 = int64_t;
+constexpr int MAXN = 5e5;
 
-array<vector<int>, 500'000> adj;
+array<vector<int>, MAXN> g;
+bitset<MAXN> vis;
+vector<int> f;
 
 int main() {
-    ios_base::sync_with_stdio(false); cin.tie(0);
-    using i64 = int64_t;
+    cin.tie(0)->sync_with_stdio(0);
 
-    int N; cin >> N;
-    vector<pair<int, int> > rect(N);
-    vector<int> v; v.reserve(2*N);
-    i64 ans = 0LL;
+    int n; cin >> n;
+    vector<pair<int, int> > rect(n);
+    f.reserve(2*n);
     for (auto& [x, y] : rect) {
         cin >> x >> y;
-        v.emplace_back(x); v.emplace_back(y);
-        ans += x + y;
+        f.emplace_back(x); f.emplace_back(y);
     }
-    sort(v.begin(), v.end());
-    auto enc = [&v] (int x) -> int {
-        return lower_bound(v.begin(), v.end(), x) - v.begin();
+    sort(f.begin(), f.end());
+    auto enc = [] (int x) -> int {
+        return lower_bound(f.begin(), f.end(), x) - f.begin();
     };
     for (auto& [x, y] : rect) {
         x = enc(x), y = enc(y);
-        adj[x].emplace_back(y);
-        adj[y].emplace_back(x);
+        g[x].emplace_back(y);
+        g[y].emplace_back(x);
     }
 
-    bitset<500'000> visited;
+    i64 ans = 0;
     queue<int> q;
-    for (int i = 0; i < 2*N; i++) if (!adj[i].empty() && !visited[i]) {
-        int V = 0, E = 0;
-        i64 S = 0LL;
-        int M = 0;
-        q.emplace(i); visited.set(i);
+    for (int i = 0; i < 2*n; i++) if (!g[i].empty() && !vis[i]) {
+        int v = 0, e2 = 0;
+        i64 s = 0;
+        int m = 0;
+        q.emplace(i); vis.set(i);
         while (!q.empty()) {
             int x = q.front(); q.pop();
-            V++; E += adj[x].size();
-            S += v[x];
-            M = max(M, v[x]);
-            for (int y : adj[x]) if (!visited[y]) {
-                q.emplace(y); visited.set(y);
+            v++;
+            e2 += g[x].size();
+            s += (g[x].size() - 1) * f[x];
+            m = max(m, f[x]);
+            for (int y : g[x]) if (!vis[y]) {
+                q.emplace(y); vis.set(y);
             }
         }
-        ans -= V == E>>1? S : S - M;
+        ans += s + (e2 < 2*v) * m;
     }
     cout << ans;
     return 0;
