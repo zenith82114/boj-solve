@@ -52,7 +52,7 @@ int main() {
     vector<elem> b;
     for (const auto& i : a)
     for (const auto& j : a) if (i != j) {
-        if (i.x < j.x && i.x <= j.x) b.emplace_back(i, j - i);
+        if (i.x < j.x && i.y <= j.y) b.emplace_back(i, j - i);
     }
     sort(begin(b), end(b));
 
