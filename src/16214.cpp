@@ -5,6 +5,7 @@
 
 #include<bits/stdc++.h>
 using namespace std;
+using i64 = int64_t;
 
 constexpr int SZ = 32000;
 array<int, SZ> spf;
@@ -36,9 +37,9 @@ int func(int n, int phi_m) {
     if (phi_m == 1) return 1;
 
     int r = func(n, phi(phi_m));
-    int64_t y = 1ll;
-    for (int j = 0; j < r && y < 2*phi_m; ++j) y *= n;
-    if (y < 2*phi_m) return y;
+    i64 y = 1;
+    for (int j = 0; j < r && y < phi_m; ++j) y *= n;
+    if (y < phi_m) return y;
     return pow_mod(n, r, phi_m) + phi_m;
 }
 
@@ -51,7 +52,7 @@ int main() {
             primes.emplace_back(i);
         }
         for (int p : primes) {
-            if (p > spf[i] || 1ll*i*p >= (int64_t)SZ) break;
+            if (p > spf[i] || 1ll*i*p >= (i64)SZ) break;
             spf[i*p] = p;
         }
     }
