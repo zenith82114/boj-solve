@@ -507,6 +507,7 @@ Polynomial Division: [hyperbolic](https://hyperbolic.tistory.com/4) / [cubelover
 
 ### Min-Cost Flow + Priority Queue
 
+  - [x] BOJ 5896 효율적으로 소 사기
   - [x] BOJ 1150 백업
   - [x] BOJ 29772 병사 분배
   - [x] BOJ 19654 Sequence
