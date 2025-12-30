@@ -459,6 +459,7 @@ Polynomial Division: [hyperbolic](https://hyperbolic.tistory.com/4) / [cubelover
 ### Eulerian Path/Circuit
 
   - [x] BOJ 1199 오일러 회로
+  - [x] BOJ 2889 레스토랑
   - [x] BOJ 1591 수열 복원
   - [x] BOJ 1616 드럼통 메시지
 
