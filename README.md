@@ -77,6 +77,7 @@ Treap: [SecondThread](https://codeforces.com/blog/entry/84017)
 
   - [x] BOJ 16994 로프와 쿼리
   - [x] BOJ 9548 무제
+  - [x] BOJ 16825 Permutation Period
   - [x] BOJ 13159 배열
   - [x] BOJ 3444 Robotic Sort
   - [x] BOJ 17607 수열과 쿼리 31
