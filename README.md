@@ -359,6 +359,7 @@ Polynomial Division: [hyperbolic](https://hyperbolic.tistory.com/4) / [cubelover
 [jhnah917](https://github.com/justiceHui/SSU-SCCC-Study/blob/master/2022-winter-adv/slide/01.pdf)
 
   - [x] BOJ 17635 다리
+  - [x] BOJ 16825 Permutation Period
   - [ ] BOJ 5823 코끼리
   - [ ] BOJ 18254 쿼리와 쿼리
   - [ ] BOJ 16793 Collapse
