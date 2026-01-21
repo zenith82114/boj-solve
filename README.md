@@ -508,7 +508,7 @@ Polynomial Division: [hyperbolic](https://hyperbolic.tistory.com/4) / [cubelover
   - [ ] BOJ 16141 정수론과 응용: 레시테이션
   - [ ] BOJ 16644 Easy Problem
 
-### Min-Cost Flow + Priority Queue
+### Network Flow Optimization with Data Structures
 
   - [x] BOJ 5896 효율적으로 소 사기
   - [x] BOJ 1150 백업
@@ -516,6 +516,7 @@ Polynomial Division: [hyperbolic](https://hyperbolic.tistory.com/4) / [cubelover
   - [x] BOJ 19654 Sequence
   - [ ] BOJ 32157 한요원의 잠입
   - [ ] BOJ 11848 Schools
+  - [x] BOJ 18586 Salty Fish
 
 ### Second MST
 
