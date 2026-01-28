@@ -29,7 +29,7 @@ inspired by [justiceHui's Unknown-To-Wellknown](https://github.com/justiceHui/Un
 
   - [x] BOJ 19672 Feast
   - [x] BOJ 16191 Utilitarianism
-  - [ ] BOJ 20090 Aliens
+  - [x] BOJ 20090 Aliens
   - [x] BOJ 24442 수열 쪼개기
   - [ ] BOJ 14510 Blazing New Trails
   - [x] BOJ 17439 꽃집
