@@ -1,65 +1,50 @@
 /*
- * Q11376 - Bipartite matching by Edmond-Karp alg.
- * Date: 2022.1.23
+ * Q11376 - bipartite matching
+ * Date: 2026.2.5
  */
 
-#include<iostream>
-#include<array>
-#include<queue>
+#include<bits/stdc++.h>
 using namespace std;
+using i64 = int64_t;
 
-array<array<int, 2002>, 2002> G;
-array<bool, 2002> visited;
-array<int, 2002> pred;
+vector<int> g[1004];
+bitset<1004> vis;
+int my[1004] {};
 
-bool bfs(int S, int T) {
-    queue<int> q;
-    q.push(S);
-    visited.fill(false);
-    visited[S] = true;
-    while (!q.empty()) {
-        int u = q.front(); q.pop();
-        for (int v = S; v <= T; ++v) {
-            if (!visited[v] && G[u][v] > 0) {
-                if (v == T) {
-                    pred[T] = u;
-                    return true;
-                }
-                visited[v] = true;
-                pred[v] = u;
-                q.push(v);
-            }
+int augment(int x) {
+    vis.set(x);
+    for (int y : g[x]) {
+        int z = my[y];
+        if (!z || (!vis[z] && augment(z))) {
+            my[y] = x;
+            return 1;
         }
     }
-    return false;
+    return 0;
 }
 
 int main() {
-    ios_base::sync_with_stdio(false);
-    cin.tie(nullptr); cout.tie(nullptr);
+    cin.tie(0)->sync_with_stdio(0);
 
-    int N, M; cin >> N >> M;
-    int T = N+M+1;
-    for (int n = 1; n <= N; ++n) {
-        G[0][n] = 2;
-        int k; cin >> k;
-        while (k--) {
-            int m; cin >> m;
-            G[n][m+N] = 1;
-        }
-    }
-    for (int m = 1; m <= M; ++m)
-        G[m+N][T] = 1;
-
-    int C = 0;
-    while (bfs(0, T)) {
-        C++;
-        for (int v = T; v != 0; v = pred[v]) {
-            G[pred[v]][v]--;
-            G[v][pred[v]]++;
+    int n, m; cin >> n >> m;
+    for (int x = 1; x <= n; ++x) {
+        int d; cin >> d;
+        while (d--) {
+            int y; cin >> y;
+            g[x].emplace_back(y);
         }
     }
 
-    cout << C << '\n';
+    int ans = 0;
+    for (int x = 1; x <= n; ++x) {
+        vis.reset();
+        if (augment(x)) {
+            ++ans;
+            vis.reset();
+            ans += augment(x);
+        }
+    }
+
+    cout << ans;
     return 0;
 }
