@@ -34,7 +34,7 @@ inspired by [justiceHui's Unknown-To-Wellknown](https://github.com/justiceHui/Un
   - [ ] BOJ 14510 Blazing New Trails
   - [x] BOJ 17439 꽃집
   - [ ] BOJ 17823 수열과 쿼리 33
-  - [ ] BOJ 18456 Jealous Split
+  - [x] BOJ 18456 Jealous Split
 
 ### Slope Trick
 
