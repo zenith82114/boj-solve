@@ -483,6 +483,7 @@ Polynomial Division: [hyperbolic](https://hyperbolic.tistory.com/4) / [cubelover
 
 ### Fast Graph Traversal with Segment Tree
 
+  - [x] BOJ 7149 Can of Worms
   - [x] BOJ 13988 비무장 지대
   - [x] BOJ 11915 전선 연결하기
 
