@@ -1,5 +1,5 @@
 /*
- * Q11933 - Tree DP + LCA
+ * Q11933 - tree compression, DP
  * Date: 2023.9.16
  */
 
