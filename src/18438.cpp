@@ -1,6 +1,6 @@
 /*
- * Q18438 - Hirschburg's
- * Date: 2026.2.13
+ * Q18438 - Hirschberg's
+ * Date: 2026.2.26
  */
 
 #include<bits/stdc++.h>
@@ -22,31 +22,34 @@ void dnc(int sl, int sr, int tl, int tr) {
 
     int h = (sl + sr)/2;
 
-    fill(fw[1] + tl, fw[1] + tr, 0);
+    fill(fw[~sl&1] + tl, fw[~sl&1] + tr, 0);
     for (int i = sl; i < h; ++i) {
-        copy(fw[1] + tl, fw[1] + tr, fw[0] + tl);
-        fw[1][tl] = fw[0][tl] | (s[i] == t[tl]);
+        int now = i&1, pre = ~i&1;
+        fw[now][tl] = fw[pre][tl] | (s[i] == t[tl]);
         for (int j = tl + 1; j < tr; ++j) {
-            fw[1][j] = (s[i] == t[j] ? fw[0][j - 1] + 1 : max(fw[1][j - 1], fw[0][j]));
+            fw[now][j] = (s[i] == t[j] ? fw[pre][j - 1] + 1 : max(fw[now][j - 1], fw[pre][j]));
         }
     }
 
-    fill(bw[1] + tl, bw[1] + tr, 0);
+    fill(bw[sr&1] + tl, bw[sr&1] + tr, 0);
     for (int i = sr - 1; i >= h; --i) {
-        copy(bw[1] + tl, bw[1] + tr, bw[0] + tl);
-        bw[1][tr - 1] = bw[0][tr - 1] | (s[i] == t[tr - 1]);
+        int now = i&1, pre = ~i&1;
+        bw[now][tr - 1] = bw[pre][tr - 1] | (s[i] == t[tr - 1]);
         for (int j = tr - 2; j >= tl; --j) {
-            bw[1][j] = (s[i] == t[j] ? bw[0][j + 1] + 1 : max(bw[1][j + 1], bw[0][j]));
+            bw[now][j] = (s[i] == t[j] ? bw[pre][j + 1] + 1 : max(bw[now][j + 1], bw[pre][j]));
         }
     }
 
-    int best = bw[1][tl], best_j = tl;
+    const auto& fw_done = fw[~h&1];
+    const auto& bw_done = bw[h&1];
+
+    int best = bw_done[tl], best_j = tl;
     for (int j = tl + 1; j < tr; ++j) {
-        if (best < fw[1][j - 1] + bw[1][j]) {
-            best = fw[1][j - 1] + bw[1][j], best_j = j;
+        if (best < fw_done[j - 1] + bw_done[j]) {
+            best = fw_done[j - 1] + bw_done[j], best_j = j;
         }
     }
-    if (best < fw[1][tr - 1]) best = fw[1][tr - 1], best_j = tr;
+    if (best < fw_done[tr - 1]) best = fw_done[tr - 1], best_j = tr;
     dnc(sl, h, tl, best_j);
     dnc(h, sr, best_j, tr);
 }
