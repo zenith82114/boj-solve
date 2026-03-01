@@ -406,7 +406,7 @@ Polynomial Division: [hyperbolic](https://hyperbolic.tistory.com/4) / [cubelover
   - [ ] BOJ 9789 Friendship Graph - $O(N^3/w)$
   - [ ] BOJ 23373 Jack the Mole - $O(N^3W/w)$
   - [ ] BOJ 17184 Nautilus
-  - [ ] BOJ 18439 LCS 6
+  - [x] BOJ 18439 LCS 6
 
 ### SIMD
 
