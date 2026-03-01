@@ -1,6 +1,6 @@
 /*
  * Q18438 - Hirschberg's
- * Date: 2026.2.26
+ * Date: 2026.3.2
  */
 
 #include<bits/stdc++.h>
@@ -8,57 +8,56 @@ using namespace std;
 using i64 = int64_t;
 constexpr int MAXN = 1e4 + 4;
 
-string s, t, u;
+string u;
 int fw[2][MAXN], bw[2][MAXN];
 
-void dnc(int sl, int sr, int tl, int tr) {
-    if (sl == sr || tl == tr) return;
-    if (sl + 1 == sr) {
-        for (int j = tl; j < tr; ++j) {
-            if (s[sl] == t[j]) { u.push_back(s[sl]); return; }
-        }
+void dnc(const string_view s, const string_view t) {
+    if (s.empty() || t.empty()) return;
+    if (s.size() == 1u) {
+        if (t.find(s[0]) != string_view::npos) u.push_back(s[0]);
         return;
     }
 
-    int h = (sl + sr)/2;
+    int n = s.size(), m = t.size();
 
-    fill(fw[~sl&1] + tl, fw[~sl&1] + tr, 0);
-    for (int i = sl; i < h; ++i) {
+    fill_n(fw[1], m + 1, 0);
+    for (int i = 0; i < n/2; ++i) {
         int now = i&1, pre = ~i&1;
-        fw[now][tl] = fw[pre][tl] | (s[i] == t[tl]);
-        for (int j = tl + 1; j < tr; ++j) {
-            fw[now][j] = (s[i] == t[j] ? fw[pre][j - 1] + 1 : max(fw[now][j - 1], fw[pre][j]));
+        fw[now][0] = 0;
+        for (int j = 1; j <= m; ++j) {
+            fw[now][j] = (s[i] == t[j - 1]
+                ? fw[pre][j - 1] + 1 : max(fw[now][j - 1], fw[pre][j]));
         }
     }
 
-    fill(bw[sr&1] + tl, bw[sr&1] + tr, 0);
-    for (int i = sr - 1; i >= h; --i) {
+    fill_n(bw[n&1], m + 1, 0);
+    for (int i = n - 1; i >= n/2; --i) {
         int now = i&1, pre = ~i&1;
-        bw[now][tr - 1] = bw[pre][tr - 1] | (s[i] == t[tr - 1]);
-        for (int j = tr - 2; j >= tl; --j) {
-            bw[now][j] = (s[i] == t[j] ? bw[pre][j + 1] + 1 : max(bw[now][j + 1], bw[pre][j]));
+        bw[now][m] = 0;
+        for (int j = m - 1; j >= 0; --j) {
+            bw[now][j] = (s[i] == t[j]
+                ? bw[pre][j + 1] + 1 : max(bw[now][j + 1], bw[pre][j]));
         }
     }
 
-    const auto& fw_done = fw[~h&1];
-    const auto& bw_done = bw[h&1];
+    const auto& fw_last = fw[~(n/2)&1];
+    const auto& bw_last = bw[(n/2)&1];
 
-    int best = bw_done[tl], best_j = tl;
-    for (int j = tl + 1; j < tr; ++j) {
-        if (best < fw_done[j - 1] + bw_done[j]) {
-            best = fw_done[j - 1] + bw_done[j], best_j = j;
+    int best = bw_last[0], best_j = 0;
+    for (int j = 1; j <= m; ++j) {
+        if (best < fw_last[j] + bw_last[j]) {
+            best = fw_last[j] + bw_last[j], best_j = j;
         }
     }
-    if (best < fw_done[tr - 1]) best = fw_done[tr - 1], best_j = tr;
-    dnc(sl, h, tl, best_j);
-    dnc(h, sr, best_j, tr);
+    dnc(s.substr(0, n/2), t.substr(0, best_j));
+    dnc(s.substr(n/2), t.substr(best_j));
 }
 
 int main() {
     cin.tie(0)->sync_with_stdio(0);
 
-    cin >> s >> t;
-    dnc(0, s.size(), 0, t.size());
+    string s, t; cin >> s >> t;
+    dnc(s, t);
     cout << u.size() << '\n' << u;
     return 0;
 }
