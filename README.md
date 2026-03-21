@@ -468,6 +468,7 @@ Polynomial Division: [hyperbolic](https://hyperbolic.tistory.com/4) / [cubelover
 ### System of Difference Constraints
 
   - [x] BOJ 7040 밥 먹기
+  - [x] BOJ 13271 스파이
   - [x] BOJ 7577 탐사
   - [x] BOJ 2081 저울추
 
