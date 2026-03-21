@@ -1,6 +1,6 @@
 /*
  * Q13367 - Stoer-Wagner alg.
- * Date: 2024.1.23
+ * Date: 2026.3.21
  */
 
 #include<bits/stdc++.h>
@@ -8,7 +8,6 @@ using namespace std;
 
 int wei[512][512];
 int f[512];
-bitset<512> live, seen;
 
 int main() {
     cin.tie(0)->sync_with_stdio(0);
@@ -26,32 +25,38 @@ int main() {
             wei[y][x] += w;
         }
 
-        live.set();
+        vector<int> alive(n); iota(alive.begin(), alive.end(), 1);
         int ans = INT32_MAX;
 
-        for (int loop1 = n; loop1 > 1; --loop1) {
+        while (alive.size() > 1) {
+            auto unseen = alive;
             int s = 0, t = 0;
             fill_n(f + 1, n, 0);
-            seen.reset();
 
-            int loop2 = loop1; while (loop2--) {
-                int x = -1, fx = -1;
-                for (int y = 1; y <= n; ++y) if (live[y] && !seen[y]) {
-                    if (fx < f[y]) x = y, fx = f[y];
+            while (!unseen.empty()) {
+                int x = -1, fx = -1; size_t x_pos = n;
+                for (size_t i = 0; i < unseen.size(); ++i) {
+                    int y = unseen[i];
+                    if (fx < f[y]) x = y, fx = f[y], x_pos = i;
                 }
                 s = t; t = x;
-                seen.set(x);
-                for (int y = 1; y <= n; ++y) if (live[y] && !seen[y]) {
+                swap(unseen[x_pos], unseen.back()); unseen.pop_back();
+                for (size_t i = 0; i < unseen.size(); ++i) {
+                    int y = unseen[i];
                     f[y] += wei[x][y];
                 }
             }
 
-            ans = min(ans, f[t]);
-            live.reset(t);
-            for (int x = 1; x <= n; ++x) if (live[x]) {
-                wei[x][s] += wei[x][t];
-                wei[s][x] = wei[x][s];
+            ans = min(ans, f[t]); if (!ans) break;
+
+            for (size_t i = 0; i < alive.size(); ++i) {
+                int x = alive[i];
+                if (x != s && x != t) {
+                    wei[x][s] += wei[x][t];
+                    wei[s][x] = wei[x][s];
+                }
             }
+            swap(*find(alive.begin(), alive.end(), t), alive.back()); alive.pop_back();
         }
 
         cout << ans << '\n';
