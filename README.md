@@ -472,8 +472,9 @@ Polynomial Division: [hyperbolic](https://hyperbolic.tistory.com/4) / [cubelover
   - [x] BOJ 7577 탐사
   - [x] BOJ 2081 저울추
 
-### KMP + Segment Tree (Extended KMP?)
+### Order-Preserving Pattern Matching (Relaxed KMP)
 
+  - [x] BOJ 3308 Matching
   - [x] BOJ 23576 Stock Price Prediction
   - [x] BOJ 20298 파인애플 피자
 
