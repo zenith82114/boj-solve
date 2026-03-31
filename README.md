@@ -47,6 +47,7 @@ inspired by [justiceHui's Unknown-To-Wellknown](https://github.com/justiceHui/Un
   - [x] BOJ 27345 Potatoes and fertilizers
   - [x] BOJ 19693 Safety
   - [x] BOJ 18720 Bookface
+  - [x] BOJ 17517 Parklife
   - [x] BOJ 12736 Fireworks
   - [x] BOJ 12010 Landscaping
 
