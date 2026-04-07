@@ -48,11 +48,11 @@ vector<char> solve_prime(int p, const vector<int>& a) {
     int s = 0;
     for (int i = 0; i < p; ++i) s = (s + a[k[i]]) % p;
     vector<char> T(p, 0); T[s] = 1;
-    vector<int> P(p, 0);
+    vector<int> P(p, -1);
 
-    for (int i = 1; i < p; ++i) {
+    for (int i = 0; i < p - 1; ++i) {
         if (T[0]) break;
-        int d = (a[k[i - 1 + p]] % p) - (a[k[i - 1]] % p);
+        int d = (a[k[i + p]] % p) - (a[k[i]] % p);
         int t = find_t(p, T, d, s);
         T[t] = 1;
         P[t] = i;
@@ -61,9 +61,9 @@ vector<char> solve_prime(int p, const vector<int>& a) {
     for (int i = 0; i < p; ++i) L[k[i]] = 1;
     for (int c = 0; s != c;) {
         int i = P[c];
-        L[k[i - 1 + p]] = 1;
-        L[k[i - 1]] = 0;
-        int d = (a[k[i - 1 + p]] % p) - (a[k[i - 1]] % p);
+        L[k[i + p]] = 1;
+        L[k[i]] = 0;
+        int d = (a[k[i + p]] % p) - (a[k[i]] % p);
         c = (c - d + p) % p;
     }
     return L;
@@ -93,8 +93,8 @@ vector<char> solve_composite(int p, int q, const vector<int>& a) {
         b.push_back(s/p);
     }
     auto ret = solve(q, b);
-    for (int i = 0; i < 2*q - 1; ++i) if (ret[i]) {
-        for (int j : T[i + 1]) L[j] = 1;
+    for (int i = 1; i < 2*q; ++i) if (ret[i - 1]) {
+        for (int j : T[i]) L[j] = 1;
     }
     return L;
 }
