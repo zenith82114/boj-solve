@@ -382,11 +382,10 @@ Polynomial Division: [hyperbolic](https://hyperbolic.tistory.com/4) / [cubelover
   - [ ] BOJ 5257 timeismoney
   - [ ] BOJ 25009 뚫기
 
-### Escape Trick (Exchange Argument on Trees)
+### Exchange Argument on Trees
 
 [koosaga](https://koosaga.com/349) / [maspy (Japanese)](https://maspypy.com/01-on-tree-%e4%ba%ac%e9%83%bd%e8%a6%b3%e5%85%89-train-seats)
 
-  - [ ] BOJ 9539 Escape
   - [ ] BOJ 18596 Monster Hunter
   - [ ] BOJ 17590 Prospecting
   - [ ] BOJ 1763 트리 색칠
