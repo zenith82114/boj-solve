@@ -386,7 +386,7 @@ Polynomial Division: [hyperbolic](https://hyperbolic.tistory.com/4) / [cubelover
 
 [koosaga](https://koosaga.com/349) / [maspy (Japanese)](https://maspypy.com/01-on-tree-%e4%ba%ac%e9%83%bd%e8%a6%b3%e5%85%89-train-seats)
 
-  - [ ] BOJ 18596 Monster Hunter
+  - [x] BOJ 18596 Monster Hunter
   - [ ] BOJ 17590 Prospecting
   - [ ] BOJ 1763 트리 색칠
 
