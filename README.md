@@ -388,7 +388,7 @@ Polynomial Division: [hyperbolic](https://hyperbolic.tistory.com/4) / [cubelover
 
   - [x] BOJ 18596 Monster Hunter
   - [ ] BOJ 17590 Prospecting
-  - [ ] BOJ 1763 트리 색칠
+  - [x] BOJ 1763 트리 색칠
 
 ### Fast I/O
 
